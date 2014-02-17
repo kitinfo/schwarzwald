@@ -1,0 +1,8 @@
+<?php
+
+$user = "USER";
+$pass = "PASSWORD";
+$dbname = "DATABASENAME";
+$port = 5432;
+$host = "HOSTNAME";
+?>

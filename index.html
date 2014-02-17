@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+	<title>Klausuren</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+
+	<link rel="stylesheet" type="text/css" href="css/klausuren.css" />
+    </head>
+    <body>
+	<div id="status"></div>
+	<header>
+	    <h1>Klausuren</h1>
+	</header>
+
+	<nav></nav>
+
+	<div id="content">
+
+	    <div id="search">
+		<form id="searchForm" action="#" onsubmit="fsdeluxe.exams.search()">
+
+		    <div id="limit">
+			<label for="limitInput">Limit: </label><input type="number" id="limitInput" value="0" />
+		    </div>
+		    <label for="searchInput">Suche: </label><input type="text" list="lecturesList" id="searchInput" value="" />
+		    <datalist id="lecturesList"></datalist>
+		    <input type="submit" value="Suche" id="searchButton" />
+
+		</form>
+
+		<div id="searchOutput" class="ouput">
+		    <table>
+			<thead>
+			    <tr>
+				<th>
+				    <input type="checkbox" id="allCheckbox" checked onclick="fsdeluxe.exams.toggleAll()" />
+				</th><th>ID</th><th>Vorlesung</th><th>Datum</th><th>Prüfer</th><th>Seiten</th><th>Preis</th>
+			    </tr>
+			</thead>
+			<tbody id="searchOutputBody">
+
+			</tbody>
+			<tfoot>
+			<td>Anzahl:</td><td id="searchCounter" class="tableLeft"></td><td></td><td></td><td></td><td class="tableRight">Gesamt: </td><td id="searchSum"></td>
+		    </tfoot>
+		    </table>
+		</div>
+	    </div>
+	    <div id="cart">
+		<div id="cartControls">
+		    <button id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</button>
+		    <button id="cartRemoveButton" onclick="fsdeluxe.exams.remCart()" >Remove</button>
+		    <input type="text" id="cartRemoveInput" />
+		</div>
+		<div id="cartOutput" class="ouput">
+		    <table>
+			<thead>
+			    <tr>
+				<th>ID</th><th>Anzahl</th><th>Vorlesung</th><th>Datum</th><th>Prüfer</th><th>Seiten</th><th>Preis</th>
+			    </tr>
+			</thead>
+			<tbody id="cartOutputBody">
+
+			</tbody>
+			<tfoot>
+			<td>Anzahl:</td><td id="cartCounter" class="tableLeft"></td><td></td><td></td><td></td><td class="tableRight">Gesamt: </td><td id="cartSum"></td>
+		    </tfoot>
+		    </table>
+		</div>
+	    </div>
+
+	</div>
+
+	<footer></footer>
+
+	<script src="static/ajax.js"></script>
+	<script src="static/lectures.js"></script>
+    </body>
+</html>
