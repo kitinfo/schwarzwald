@@ -14,7 +14,8 @@ $klausuren = $_GET['klausuren'];
     $vorlesungen = $_GET['vorlesungen'];
     $prof = $_GET['prof'];
 
-    $db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';user=' . $user . ';password=' . $pass);
+    $db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';user=' . $user . ';password=' . $pass . 
+';sslmode=require');
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 
 	if (isset($klausuren)) {
