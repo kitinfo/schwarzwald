@@ -9,6 +9,12 @@
 require 'config.php';
 main();
 
+abstract class TYPE {
+    const PROTOCOL = 0;
+    const EXAM = 1;
+}
+
+
 function main() {
     global $db, $output;
 
@@ -27,9 +33,11 @@ function main() {
     //klausuren
     if (isset($_GET["k"])) {
 	$elem = new Klausuren();
+	$output->add("type", TYPE::EXAM);
     }
     // protokolle
     else if (isset($_GET["p"])) {
+	$output->add("type", TYPE::PROTOCOL);
 	$elem = new Protokolle();
     } else {
 	$output->write();

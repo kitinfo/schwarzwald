@@ -9,7 +9,6 @@ fsdeluxe.exams = {
      * @type String url to the api
      */
     apiUrl: "server/db.php",
-
     /**
      * price per page
      * @type Number page price;
@@ -59,6 +58,14 @@ fsdeluxe.exams = {
 	    tdID.classList.add('colID');
 	    tdID.textContent = val.id;
 	    return tdID;
+	},
+	typeCol: function(type) {
+	    var tdType = document.createElement('td');
+	    tdType.classList.add('colType');
+	    tdType.textContent = type;
+	    
+	    
+	    return tdType;
 	},
 	/**
 	 * Build a td with the lecture name of the object
@@ -129,6 +136,10 @@ fsdeluxe.exams = {
 	    return tdDatum;
 	}
     },
+    TYPE: [
+	{id: 0, name: "Protokoll"},
+	{id: 1, name: "Klausur"}
+    ],
     fillExams: function(xhr) {
 
 	var self = fsdeluxe.exams;
@@ -136,31 +147,31 @@ fsdeluxe.exams = {
 	    return;
 	}
 	var data = JSON.parse(xhr.response);
-
 	document.getElementById(self.statusTag).textContent = xhr.status;
-
 	var outputTable = document.getElementById(self.searchOutputTBody);
-
 	outputTable.innerHTML = "";
 	self.searchElements = [];
-
+	var type = "";
+	self.TYPE.forEach(function(val) {
+		if (val.id === data.type) {
+		    type = val;
+		}
+	    });
 	data.search.forEach(function(val) {
 	    var tr = document.createElement('tr');
 	    tr.classList.add('searchRow' + val.id);
-
 	    tr.appendChild(self.columns.checkboxCol(val, "search"));
 	    tr.appendChild(self.columns.idCol(val));
+	    tr.appendChild(self.columns.typeCol(type.name));
 	    tr.appendChild(self.columns.lecturesCol(val));
 	    tr.appendChild(self.columns.datumCol(val));
 	    tr.appendChild(self.columns.profCol(val));
 	    tr.appendChild(self.columns.pageCol(val));
 	    tr.appendChild(self.columns.priceCol(val));
-
 	    outputTable.appendChild(tr);
-
+	    val.type = type;
 	    self.searchElements.push(val);
 	});
-
 	self.calcPrice("search");
     },
     /**
@@ -172,22 +183,21 @@ fsdeluxe.exams = {
 	var self = fsdeluxe.exams;
 	var checkboxes = document.getElementsByClassName('searchCheckbox');
 	var checked = document.getElementById("allCheckbox").checked;
-	
 	for (var i = 0; i < checkboxes.length; i++) {
 	    checkboxes[i].checked = checked;
 	}
-	
 
-/*	if (document.getElementById("allCheckbox").checked === true) {
 
-	    for (var i = 0; i < checkboxes.length; i++) {
-		checkboxes[i].checked = true;
-	    }
-	} else {
-	    for (var i = 0; i < checkboxes.length; i++) {
-		checkboxes[i].checked = false;
-	    }
-	}*/
+	/*	if (document.getElementById("allCheckbox").checked === true) {
+	 
+	 for (var i = 0; i < checkboxes.length; i++) {
+	 checkboxes[i].checked = true;
+	 }
+	 } else {
+	 for (var i = 0; i < checkboxes.length; i++) {
+	 checkboxes[i].checked = false;
+	 }
+	 }*/
 
 	self.calcPrice("search");
     },
@@ -198,20 +208,17 @@ fsdeluxe.exams = {
      */
     fillLectureDatalist: function(xhr) {
 	var datalist = document.getElementById("lecturesList");
-	fsdeluxe.exams.fillDatalist(datalist, "vorlesung" ,xhr);
+	fsdeluxe.exams.fillDatalist(datalist, "vorlesung", xhr);
     },
     fillProfDatalist: function(xhr) {
 	var datalist = document.getElementById("profList");
-	fsdeluxe.exams.fillDatalist(datalist, "prof" ,xhr);
+	fsdeluxe.exams.fillDatalist(datalist, "prof", xhr);
     },
     fillDatalist: function(datalist, tag, xhr) {
 	var self = fsdeluxe.exams;
 	var v = JSON.parse(xhr.response);
-
 	document.getElementById(self.statusTag).textContent = xhr.status;
-
 	datalist.innerHTML = "";
-
 	v[tag].forEach(function(val) {
 	    var item = document.createElement('option');
 	    item.setAttribute('value', val[tag]);
@@ -233,7 +240,7 @@ fsdeluxe.exams = {
 		+ "&prof=" + prof
 		+ "&limit=" + limit,
 		self.fillExams, self.error);
-        return true;
+	return true;
     },
     /**
      * gets all lectures from the server
@@ -242,14 +249,14 @@ fsdeluxe.exams = {
     getLectures: function() {
 	var self = fsdeluxe.exams;
 	var elem = document.getElementById("typeSelector");
-        ajax.asyncGet(this.apiUrl + "?" + elem.value 
-                + "&vorlesungen", self.fillLectureDatalist, self.error);
+	ajax.asyncGet(this.apiUrl + "?" + elem.value
+		+ "&vorlesungen", self.fillLectureDatalist, self.error);
     },
     getProfs: function() {
 	var self = fsdeluxe.exams;
 	var elem = document.getElementById("typeSelector");
-        ajax.asyncGet(this.apiUrl + "?" + elem.value 
-                + "&profs", self.fillProfDatalist, self.error);
+	ajax.asyncGet(this.apiUrl + "?" + elem.value
+		+ "&profs", self.fillProfDatalist, self.error);
     },
     /**
      * Calculates the price for all checked lectures.
@@ -263,7 +270,6 @@ fsdeluxe.exams = {
 	var counter = 0;
 	var sum = 0.00;
 	var calc;
-
 	if (place === "cart") {
 
 	    calc = function(val) {
@@ -283,7 +289,6 @@ fsdeluxe.exams = {
 	    calc(val);
 	});
 	counterElem.textContent = counter;
-
 	sumElem.textContent = sum.toFixed(2);
     },
     /**
@@ -295,13 +300,10 @@ fsdeluxe.exams = {
 	console.log("Error getting request");
 	console.log(xhr);
 	document.getElementById("status").textContent = xhr.responseText;
-	
     },
     addToCart: function() {
 	var self = fsdeluxe.exams;
-
 	var cartBody = document.getElementById(self.cartTableBody);
-
 	self.searchElements.forEach(function(val) {
 
 	    if (document.getElementById("searchCheckbox" + val.id).checked) {
@@ -313,21 +315,17 @@ fsdeluxe.exams = {
 		    var counter = parseInt(counterElem.value);
 		    counter++;
 		    counterElem.value = counter;
-
 		} else {
 
 		    var tr = document.createElement('tr');
 		    tr.setAttribute('id', 'cartRow' + val.id);
-
 		    var tdID = self.columns.idCol(val);
-
 		    // brings the id to the cartRemoveInput field with a click
 		    tdID.addEventListener('click', function() {
 			document.getElementById(self.cartRemoveInput).value = val.id;
 		    }, false);
 		    tr.appendChild(tdID);
-
-
+		    tr.appendChild(self.columns.typeCol(val.type.name));
 		    // counter field
 		    var tdCounter = document.createElement('input');
 		    tdCounter.classList.add('colCounter');
@@ -339,26 +337,21 @@ fsdeluxe.exams = {
 			fsdeluxe.exams.calcPrice("cart");
 		    });
 		    tr.appendChild(tdCounter);
-
-
 		    // rest of table row
 		    tr.appendChild(self.columns.lecturesCol(val));
 		    tr.appendChild(self.columns.datumCol(val));
 		    tr.appendChild(self.columns.profCol(val));
 		    tr.appendChild(self.columns.pageCol(val));
-
 		    // price tag
 		    var tdPrice = document.createElement('td');
 		    tdPrice.classList.add('colCartPrice');
 		    tdPrice.textContent = (val.seiten * self.pagePrice).toFixed(2);
 		    tr.appendChild(tdPrice);
-
 		    cartBody.appendChild(tr);
 		    self.cartElements[val.id] = val;
 		}
 	    }
 	});
-
 	self.calcPrice("cart");
     },
     /**
@@ -371,7 +364,6 @@ fsdeluxe.exams = {
 	var row = document.getElementById("cartRow" + id);
 	document.getElementById(self.cartTableBody).removeChild(row);
 	self.cartElements.splice(id, id);
-
 	self.calcPrice("cart");
     },
     typeChanged: function() {
@@ -381,6 +373,5 @@ fsdeluxe.exams = {
 	document.getElementById("headerTitle").textContent = elem.options[elem.selectedIndex].text;
     }
 };
-
 // begin with Lectures
 fsdeluxe.exams.typeChanged();
