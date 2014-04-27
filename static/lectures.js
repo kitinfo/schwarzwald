@@ -80,8 +80,11 @@ fsdeluxe.exams = {
 	checkboxCol: function(val, place) {
 	    var tdCheck = document.createElement('td');
 	    var checkbox = document.createElement('input');
+	    var checked = document.getElementById("allCheckbox").checked;
 	    checkbox.setAttribute('type', 'checkbox');
-	    checkbox.setAttribute('checked', 'checked');
+	    if (checked) {
+		checkbox.setAttribute('checked', checked);
+	    }
 	    checkbox.setAttribute('id', place + 'Checkbox' + val.id);
 	    checkbox.setAttribute('class', place + 'Checkbox');
 	    checkbox.addEventListener('change', function() {
@@ -170,9 +173,9 @@ fsdeluxe.exams = {
 	var checkboxes = document.getElementsByClassName('searchCheckbox');
 	var checked = document.getElementById("allCheckbox").checked;
 	
-	checkboxes.forEach(function(val) {
-	   val.checked = !checked; 
-	});
+	for (var i = 0; i < checkboxes.length; i++) {
+	    checkboxes[i].checked = checked;
+	}
 	
 
 /*	if (document.getElementById("allCheckbox").checked === true) {
@@ -374,6 +377,7 @@ fsdeluxe.exams = {
     typeChanged: function() {
 	fsdeluxe.exams.getLectures();
 	fsdeluxe.exams.getProfs();
+	var elem = document.getElementById("typeSelector");
 	document.getElementById("headerTitle").textContent = elem.options[elem.selectedIndex].text;
     }
 };

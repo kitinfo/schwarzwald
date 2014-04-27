@@ -11,6 +11,7 @@ and open the template in the editor.
 	<meta name="viewport" content="width=device-width">
 
 	<link rel="stylesheet" type="text/css" href="css/klausuren.css" />
+	<script src="static/sort.js"></script>
     </head>
     <body>
 	<div id="status"></div>
@@ -51,7 +52,7 @@ and open the template in the editor.
 			<thead>
 			    <tr>
 				<th>
-				    <input type="checkbox" id="allCheckbox" checked onclick="fsdeluxe.exams.toggleAll()" />
+				    <input type="checkbox" id="allCheckbox" onclick="fsdeluxe.exams.toggleAll()" />
 				</th><th>ID</th><th>Vorlesung</th><th>Datum</th><th>Prüfer</th><th>Seiten</th><th>Preis</th>
 			    </tr>
 			</thead>
@@ -63,10 +64,10 @@ and open the template in the editor.
 			</tfoot>
 		    </table>
 		</div>
+		<button id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</button>
 	    </div>
 	    <div id="cart">
 		<div id="cartControls">
-		    <button id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</button>
 		    <button id="cartRemoveButton" onclick="fsdeluxe.exams.remCart()" >Remove</button>
 		    <input type="text" id="cartRemoveInput" />
 		</div>
