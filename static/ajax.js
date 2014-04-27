@@ -40,12 +40,14 @@ var ajax={
 		request.onreadystatechange=
 			function(){
 		    if (request.readyState == 4) {
+			
 			if (request.status == 200) {
 			    readyfunc(request);
 			} else {
 			    errfunc(request);
 			}
 		    }
+		    
 		};
 			
 		request.open("GET",url,true,user,pass);

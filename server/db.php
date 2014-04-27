@@ -7,85 +7,344 @@
  */
 
 require 'config.php';
+main();
 
-//if (isset($user) && !empty($user)) {
-$retVal['status'] = "no input (or buy id=0)";
-$klausuren = $_GET['klausuren'];
-    $vorlesungen = $_GET['vorlesungen'];
-    $prof = $_GET['prof'];
+function main() {
+    global $db, $output;
 
-    $db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';user=' . $user . ';password=' . $pass . 
-';sslmode=require');
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+    // init
+    $output = Output::getInstance();
+    $db = new DB();
 
-	if (isset($klausuren)) {
-	$retVal = getKlausuren($db, $klausuren);
+    // db connection
+    if (!$db->connect()) {
+	header("WWW-Authenticate: Basic realm=\"Garfield API Access (Invalid Credentials for " . $_SERVER['PHP_AUTH_USER'] . ")\"");
+	header("HTTP/1.0 401 Unauthorized");
+
+	die();
     }
-    if (isset($vorlesungen)) {
-	$retVal["vorlesungen"] = getVorlesungen($db);
+
+    //klausuren
+    if (isset($_GET["k"])) {
+	$elem = new Klausuren();
     }
-
-    header("Access-Control-Allow-Origin: *");
-
-echo json_encode($retVal);
-    /* } else {
-
-  header("WWW-Authenticate: Basic realm=\"FSMI DB Access (Invalid Credentials for " . $_SERVER['PHP_AUTH_USER'] . ")\"");
-  header("HTTP/1.0 401 Unauthorized");
-
-  echo '{"status": "wrong user/password"}';
-  } */
-
-function getKlausuren($db, $klausuren) {
-    $retVal['status'] = "ok";
-
-    $limit = $_GET['limit'];
-
-    $begin = "SELECT id, vorlesung, datum, prof, kommentar, seiten FROM public.klausuren";
-
-    if (isset($limit) && !empty($limit)) {
-	$ende = " AND veraltet = false ORDER BY datum DESC LIMIT " . $limit;
+    // protokolle
+    else if (isset($_GET["p"])) {
+	$elem = new Protokolle();
     } else {
-	$ende = " AND veraltet = false ORDER BY datum DESC";
+	$output->write();
+	die();
     }
 
-
-    if (empty($klausuren)) {
-	$klausurenQuery = $begin . $ende;
-	$stm = $db->prepare($klausurenQuery);
-	$retVal['status'] = $stm->execute();
+    if (isset($_GET["search"])) {
+	$elem->search($_GET["search"]);
+    } else if (isset($_GET["vorlesungen"])) {
+	$elem->getVorlesungen();
+    } else if (isset($_GET["profs"])) {
+	$elem->getProfs();
     } else {
-
-	$klausurenQuery = $begin . " WHERE vorlesung ILIKE :p1" . $ende;
-
-	$stm = $db->prepare($klausurenQuery);
-	$klausurenMit = "%" . $klausuren . "%";
-	$retVal['status'] = $stm->execute(array(
-	    ":p1" => $klausurenMit
-	));
-
+	$elem->getAll();
     }
 
-    $retVal['klausuren'] = $stm->fetchAll(PDO::FETCH_ASSOC);
-    $stm->closeCursor();
-    return $retVal;
+    $output->write();
 }
 
-function getVorlesungen($db) {
+class Klausuren {
 
-    return getGroup($db, "vorlesung");
+    function search($klausuren) {
+	global $db, $output, $orderBy;
+
+	if (empty($klausuren)) {
+	    return $this->getAll();
+	} else {
+	    $sql = "SELECT id, vorlesung, datum, prof, kommentar, seiten "
+		    . "FROM public.klausuren WHERE vorlesung ILIKE :p1 AND "
+		    . "veraltet = false";
+
+	    $klausurenMit = "%" . $klausuren . "%";
+	    $param = array(
+		":p1" => $klausurenMit
+	    );
+
+	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+		$sql .= " AND prof ILIKE :prof";
+		$param[":prof"] = "%" . $_GET["prof"] . "%";
+	    }
+	    $db->setOrder("datum", "DESC");
+
+	    $stm = $db->query($sql, $param);
+	}
+	$output->addStatus("search", $stm->errorInfo());
+	if ($stm !== false) {
+
+	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+	    $stm->closeCursor();
+	}
+    }
+
+    public function getAll() {
+	global $db, $output;
+
+	$sql = "SELECT id, vorlesung, datum, prof, kommentar, seiten FROM "
+		. "public.klausuren WHERE veraltet = false";
+	$param = array();
+	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+	    $sql .= " AND prof ILIKE :prof";
+	    $param[":prof"] = $_GET["prof"];
+	}
+
+	$db->setOrder("datum", "DESC");
+	$stm = $db->query($sql, $param);
+
+	$output->addStatus("search", $stm->errorInfo());
+	if ($stm !== false) {
+	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+	    $stm->closeCursor();
+	}
+    }
+
+    public function getVorlesungen() {
+	$this->getGroups("vorlesung");
+    }
+
+    public function getProfs() {
+	$this->getGroups("prof");
+    }
+
+    public function getGroups($col) {
+	global $db, $output;
+
+	$query = "SELECT " . $col . " FROM public.klausuren GROUP BY " . $col;
+
+	$stmt = $db->query($query);
+
+	$output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
 }
 
-function getProfs($db) {
-    return getGroup($db, "prof");
+class Protokolle {
+
+    public function getAll() {
+
+	global $db, $output;
+
+	$query = "SELECT protokolle.id, pruefername AS prof,datum, seiten, "
+		. "vertiefungsgebiet as vorlesung, '' AS kommentar FROM protokolle JOIN gebiet "
+		. "ON (protokolle.gebiet = gebiet.id) "
+		. "JOIN pruefungpruefer ON "
+		. "(protokolle.id = protokollid) JOIN pruefer ON "
+		. "(pruefungpruefer.prueferid = pruefer.id)";
+	$db->setOrder("datum", "DESC");
+
+	$param = array();
+	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+	    $query .= " WHERE pruefername ILIKE :prof";
+	    $param[":prof"] = "%" . $_GET["prof"] . "%";
+	}
+
+	$stm = $db->query($query, $param);
+
+	$output->addStatus("search", $stm->errorInfo());
+	if ($stm !== null) {
+
+	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+
+	    $stm->closeCursor();
+	}
+    }
+
+    public function search($search) {
+
+	global $db, $output, $orderBy;
+
+	if (empty($search)) {
+	    return $this->getAll();
+	} else {
+	    $query = "SELECT protokolle.id, pruefername AS prof,datum, seiten, "
+		    . "vertiefungsgebiet as vorlesung, '' AS kommentar FROM protokolle JOIN gebiet "
+		    . "ON (protokolle.gebiet = gebiet.id) "
+		    . "JOIN pruefungpruefer ON "
+		    . "(protokolle.id = protokollid) JOIN pruefer ON "
+		    . "(pruefungpruefer.prueferid = pruefer.id) WHERE gebiet.vertiefungsgebiet ILIKE :vorlesung";
+
+	    $searchNew = "%" . $search . "%";
+	    $param = array(
+		":vorlesung" => $searchNew
+	    );
+
+	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+		$query .= " AND pruefername ILIKE :prof";
+		$param[":prof"] = "%" . $_GET["prof"] . "%";
+	    }
+
+	    $db->setOrder("datum", "DESC");
+	    $stm = $db->query($query, $param);
+	}
+	$output->addStatus("search", $stm->errorInfo());
+	if ($stm !== false) {
+
+	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+	    $stm->closeCursor();
+	}
+    }
+
+    public function getVorlesungen() {
+	$this->getGroups("vertiefungsgebiet", "vorlesung");
+    }
+
+    public function getProfs() {
+	$this->getGroups("pruefername", "prof");
+    }
+
+    public function getGroups($col, $table) {
+	global $db, $output;
+
+	if (isset($table) && !empty($table)) {
+	    $erg = $col . " AS " . $table;
+	} else {
+	    $erg = $col;
+	}
+
+	$query = "SELECT " . $erg . " FROM protokolle JOIN gebiet ON "
+		. "(protokolle.gebiet = gebiet.id) JOIN pruefungpruefer ON "
+		. "(protokolle.id = protokollid) JOIN pruefer ON "
+		. "(pruefungpruefer.prueferid = pruefer.id) GROUP BY " . $col;
+
+	$stmt = $db->query($query);
+
+	if (isset($table) && !empty($table)) {
+	    $output->add($table, $stmt->fetchAll(PDO::FETCH_ASSOC));
+	    return;
+	}
+
+	$output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
 }
 
-function getGroup($db, $col) {
-    $query = "SELECT " . $col . " FROM public.klausuren GROUP BY " . $col;
+class DB {
 
-    $stmt = $db->query($query);
+    private $db;
+    private $order = "";
 
-    $retVal = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    function connect() {
+	global $dbname, $user, $pass, $port, $host;
 
-    return $retVal;
+	try {
+	    $this->db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';user=' . $user . ';password=' . $pass . ';sslmode=require');
+	    $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+	} catch (PDOException $e) {
+
+
+	    if (strpos($e->getMessage(), "user") !== false) {
+		return false;
+	    }
+	    header("Status: 500 " . $e->getMessage());
+	    echo $e->getMessage();
+	    die();
+	}
+
+	return true;
+    }
+
+    function setOrder($tag, $order) {
+	$this->order = " ORDER BY " . $tag . " " . $order;
+    }
+
+    function query($sql, $params) {
+	global $output, $orderBy;
+
+	if (strpos($sql, "SELECT") !== false) {
+
+	    $sql .= $this->order;
+
+	    if ($_GET["limit"] && !empty($_GET["limit"])) {
+		$sql .= " LIMIT :limit";
+		$params[":limit"] = $_GET["limit"];
+	    }
+	}
+
+	$stm = $this->db->prepare($sql);
+
+	if ($this->db->errorCode() > 0) {
+	    $output->addStatus("db", $this->db->errorInfo());
+	    return null;
+	}
+
+	$stm->execute($params);
+
+
+	return $stm;
+    }
+
+}
+
+/**
+ * output functions
+ */
+class Output {
+
+    private static $instance;
+    public $retVal;
+
+    /**
+     * constructor
+     */
+    private function __construct() {
+	$this->retVal['status']["db"] = "ok";
+    }
+
+    /**
+     * Returns the output instance or creates it.
+     * @return Output output instance
+     */
+    public static function getInstance() {
+	if (!self::$instance) {
+	    self::$instance = new self();
+	}
+
+	return self::$instance;
+    }
+
+    /**
+     * Adds data for use to output.
+     * @param type $table
+     * @param type $output
+     */
+    public function add($table, $output) {
+	$this->retVal[$table] = $output;
+    }
+
+    /**
+     * Adds an status for output
+     * @param type $table status table
+     * @param type $output message (use an array with 3 entries ("id", <code>, <message>))
+     */
+    public function addStatus($table, $output) {
+
+	if ($output[1]) {
+	    $this->retVal["status"]["debug"][] = $output;
+	    $this->retVal["status"]["db"] = "failed";
+	}
+
+	$this->retVal['status'][$table] = $output;
+    }
+
+    /**
+     * Generates the output for the browser. General you call this only once.
+     */
+    public function write() {
+
+	header("Content-Type: application/json");
+	header("Access-Control-Allow-Origin: *");
+	# Rückmeldung senden
+	if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
+	    $callback = $_GET["callback"];
+	    echo $callback . "('" . json_encode($this->retVal, JSON_NUMERIC_CHECK) . "')";
+	} else {
+	    echo json_encode($this->retVal, JSON_NUMERIC_CHECK);
+	}
+    }
+
 }

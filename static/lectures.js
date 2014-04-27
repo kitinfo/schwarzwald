@@ -1,5 +1,6 @@
-if (!fsdeluxe) {
-    var fsdeluxe = new Function();
+document.getElementById("status").textContent = "200";
+if (!window.fsdeluxe) {
+    var fsdeluxe = {};
 }
 
 fsdeluxe.exams = {
@@ -18,12 +19,12 @@ fsdeluxe.exams = {
      * Elements in search ouput
      * @type Array list of lecture objects in the search output
      */
-    searchElements: new Array(),
+    searchElements: [],
     /**
      * Elements in cart
      * @type Array list of lecture objects in cart
      */
-    cartElements: new Array(),
+    cartElements: [],
     // tags
     outputHTMLTag: "output",
     searchOutputTBody: "searchOutputBody",
@@ -77,7 +78,6 @@ fsdeluxe.exams = {
 	 * @returns {<td>} td element
 	 */
 	checkboxCol: function(val, place) {
-	    var self = fsdeluxe.exams;
 	    var tdCheck = document.createElement('td');
 	    var checkbox = document.createElement('input');
 	    checkbox.setAttribute('type', 'checkbox');
@@ -92,7 +92,7 @@ fsdeluxe.exams = {
 	},
 	/**
 	 * Build a td element with the price of the lecture.
-	 * @param {lecture object} lecture object for building the td
+	 * @param {lecture object} val object for building the td
 	 * @param {type} place where we want this price td (search, cart)
 	 * @returns {<td>} td element
 	 */
@@ -139,9 +139,9 @@ fsdeluxe.exams = {
 	var outputTable = document.getElementById(self.searchOutputTBody);
 
 	outputTable.innerHTML = "";
-	self.searchElements = new Array();
+	self.searchElements = [];
 
-	data.klausuren.forEach(function(val) {
+	data.search.forEach(function(val) {
 	    var tr = document.createElement('tr');
 	    tr.classList.add('searchRow' + val.id);
 
@@ -168,8 +168,14 @@ fsdeluxe.exams = {
 
 	var self = fsdeluxe.exams;
 	var checkboxes = document.getElementsByClassName('searchCheckbox');
-	if (document.getElementById("allCheckbox").checked == true) {
+	var checked = document.getElementById("allCheckbox").checked;
+	
+	checkboxes.forEach(function(val) {
+	   val.checked = !checked; 
+	});
+	
 
+/*	if (document.getElementById("allCheckbox").checked === true) {
 
 	    for (var i = 0; i < checkboxes.length; i++) {
 		checkboxes[i].checked = true;
@@ -178,7 +184,7 @@ fsdeluxe.exams = {
 	    for (var i = 0; i < checkboxes.length; i++) {
 		checkboxes[i].checked = false;
 	    }
-	}
+	}*/
 
 	self.calcPrice("search");
     },
@@ -188,17 +194,24 @@ fsdeluxe.exams = {
      * @returns {void}
      */
     fillLectureDatalist: function(xhr) {
+	var datalist = document.getElementById("lecturesList");
+	fsdeluxe.exams.fillDatalist(datalist, "vorlesung" ,xhr);
+    },
+    fillProfDatalist: function(xhr) {
+	var datalist = document.getElementById("profList");
+	fsdeluxe.exams.fillDatalist(datalist, "prof" ,xhr);
+    },
+    fillDatalist: function(datalist, tag, xhr) {
 	var self = fsdeluxe.exams;
 	var v = JSON.parse(xhr.response);
 
 	document.getElementById(self.statusTag).textContent = xhr.status;
 
-	var datalist = document.getElementById('lecturesList');
 	datalist.innerHTML = "";
 
-	v.vorlesungen.forEach(function(val) {
+	v[tag].forEach(function(val) {
 	    var item = document.createElement('option');
-	    item.setAttribute('value', val.vorlesung);
+	    item.setAttribute('value', val[tag]);
 	    datalist.appendChild(item);
 	});
     },
@@ -210,9 +223,14 @@ fsdeluxe.exams = {
 	var self = fsdeluxe.exams;
 	var searchString = document.getElementById(self.searchTag).value;
 	var limit = document.getElementById(self.limitTag).value;
-	ajax.asyncGet(this.apiUrl + "?klausuren="
-		+ searchString + "&limit=" + limit,
+	var type = document.getElementById("typeSelector").value;
+	var prof = document.getElementById("profInput").value;
+	ajax.asyncGet(this.apiUrl + "?" + type
+		+ "&search=" + searchString
+		+ "&prof=" + prof
+		+ "&limit=" + limit,
 		self.fillExams, self.error);
+        return true;
     },
     /**
      * gets all lectures from the server
@@ -220,7 +238,15 @@ fsdeluxe.exams = {
      */
     getLectures: function() {
 	var self = fsdeluxe.exams;
-	ajax.asyncGet(this.apiUrl + "?vorlesungen", self.fillLectureDatalist, self.error);
+	var elem = document.getElementById("typeSelector");
+        ajax.asyncGet(this.apiUrl + "?" + elem.value 
+                + "&vorlesungen", self.fillLectureDatalist, self.error);
+    },
+    getProfs: function() {
+	var self = fsdeluxe.exams;
+	var elem = document.getElementById("typeSelector");
+        ajax.asyncGet(this.apiUrl + "?" + elem.value 
+                + "&profs", self.fillProfDatalist, self.error);
     },
     /**
      * Calculates the price for all checked lectures.
@@ -238,7 +264,7 @@ fsdeluxe.exams = {
 	if (place === "cart") {
 
 	    calc = function(val) {
-		var elemCounter = parseInt(document.getElementById("cartCounter" + val.id).value);
+		var elemCounter = +(document.getElementById("cartCounter" + val.id).value);
 		sum += val.seiten * self.pagePrice * elemCounter;
 		counter += elemCounter;
 	    };
@@ -263,8 +289,10 @@ fsdeluxe.exams = {
      * @returns {undefined}
      */
     error: function(xhr) {
-	document.getElementById("status").value = "Error in getting data from server.";
+	console.log("Error getting request");
 	console.log(xhr);
+	document.getElementById("status").textContent = xhr.responseText;
+	
     },
     addToCart: function() {
 	var self = fsdeluxe.exams;
@@ -342,8 +370,13 @@ fsdeluxe.exams = {
 	self.cartElements.splice(id, id);
 
 	self.calcPrice("cart");
+    },
+    typeChanged: function() {
+	fsdeluxe.exams.getLectures();
+	fsdeluxe.exams.getProfs();
+	document.getElementById("headerTitle").textContent = elem.options[elem.selectedIndex].text;
     }
-}
+};
 
 // begin with Lectures
-fsdeluxe.exams.getLectures();
+fsdeluxe.exams.typeChanged();
