@@ -221,20 +221,48 @@ class Protokolle {
 	.	" ON (protokollid = protokolle.id)"
 	. " JOIN vorlesungen" 
 	.	" ON (vorlesungen.id = vorlesungsid)";
+	    
+	    $param = array();
 
-	    $searchNew = "%" . $search . "%";
-	    $param = array(
-		":vorlesung" => $searchNew
-	    );
-
+	    $query .= " GROUP BY protokolle.id";
+	    
+	    $searchNew = explode(";AND;",$search);
+	    
+	    $query .= " HAVING";
+	    
+	    $oCounter = 0;
+	    
+	    for ($i = 0; $i < count($searchNew); $i++) {
+		
+		if ($i != 0) {
+		    $query .= " AND";
+		}
+		
+		$query .= " (";
+		
+		$in = explode(";OR;",$searchNew[$i]);
+		
+		for ($j = 0; $j < count($in); $j++) {
+		    
+		    if ($j != 0) {
+			$query .= " OR";
+		    }
+		    
+		    $query .= " string_agg(vorlesungen.vorlesung, ', ') ILIKE :v" . $oCounter;
+		    $param[":v" . $oCounter] = "%" . $in[$j] . "%";
+		    $oCounter++;
+		}
+		
+		$query .= ")";
+	    }
+	    $output->addStatus("debug", $query);
+		
+	    //$query .= " HAVING string_agg(vorlesungen.vorlesung, ', ') ILIKE :vorlesung";
+	    
 	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-		$query .= " AND pruefername ILIKE :prof";
+		$query .= " AND string_agg(pruefername, ',') ILIKE :prof";
 		$param[":prof"] = "%" . $_GET["prof"] . "%";
 	    }
-	    
-	    $query .= " GROUP BY protokolle.id";
-		
-	    $query .= " HAVING string_agg(vorlesungen.vorlesung, ', ') ILIKE :vorlesung";
 	    
 	    $db->setOrder("datum", "DESC");
 	    $stm = $db->query($query, $param);
