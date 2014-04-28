@@ -83,9 +83,9 @@ fsdeluxe.exams = {
 	    tdLectures.classList.add('colLectures');
 
 
-	    if (typeof val.prof === 'string') {
+	    //if (typeof val.prof === 'string') {
 		tdLectures.textContent = val.vorlesung;
-	    } else {
+	    /*} else {
 		var ul = document.createElement('ul');
 		val.vorlesung.forEach(function(val) {
 		    var li = document.createElement('li');
@@ -93,7 +93,7 @@ fsdeluxe.exams = {
 		    ul.appendChild(li);
 		});
 		tdLectures.appendChild(ul);
-	    }
+	    }*/
 	    return tdLectures;
 	},
 	/**
@@ -139,9 +139,9 @@ fsdeluxe.exams = {
 	profCol: function(val) {
 	    var tdProf = document.createElement('td');
 	    tdProf.classList.add('colProf');
-	    if (typeof val.prof === 'string') {
+	    //if (typeof val.prof === 'string') {
 		tdProf.textContent = val.prof;
-	    } else {
+	    /*} else {
 		var ul = document.createElement('ul');
 		val.prof.forEach(function(val) {
 		    var li = document.createElement('li');
@@ -149,7 +149,7 @@ fsdeluxe.exams = {
 		    ul.appendChild(li);
 		});
 		tdProf.appendChild(ul);
-	    }
+	    }*/
 	    return tdProf;
 	},
 	/**

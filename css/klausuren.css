@@ -118,3 +118,8 @@ tbody tr:nth-child(odd) {
 tbody tr:nth-child(even) {
     background-color: #eee;
 }
+
+.colDatum {
+    min-width: 5em;
+    max-width: 5em;
+}

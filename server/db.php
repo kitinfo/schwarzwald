@@ -215,8 +215,8 @@ class Protokolle {
 	    return $this->getAll();
 	} else {
 	    $query = "SELECT protokolle.id AS id, datum, seiten, "
-		. "string_agg(dozent, ', ') AS prof, "
-		. "string_agg(vorlesung, ', ') AS vorlesung FROM protokolle"
+		. "string_agg(DISTINCT dozent, ', ') AS prof, "
+		. "string_agg(DISTINCT vorlesung, ', ') AS vorlesung FROM protokolle"
 	. " JOIN pruefungvorlesung"
 	.	" ON (protokollid = protokolle.id)"
 	. " JOIN vorlesungen" 
