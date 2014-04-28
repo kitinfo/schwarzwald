@@ -122,9 +122,20 @@ class Klausuren {
     public function getGroups($col) {
 	global $db, $output;
 
-	$query = "SELECT " . $col . " FROM public.klausuren GROUP BY " . $col;
-
-	$stmt = $db->query($query);
+	$query = "SELECT " . $col . " FROM public.klausuren";
+	$param = array();
+	if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
+	    $query .= " WHERE vorlesung ILIKE :vorlesung";
+	    $param[":vorlesung"] = "%" . $_GET["vorlesung"] . "%";
+	}
+	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+	    $query .= " WHERE prof ILIKE :prof";
+	    $param[":prof"] = "%" . $_GET["prof"] . "%";
+	}
+	
+	$query .= " GROUP BY " . $col;
+	
+	$stmt = $db->query($query, $param);
 
 	$output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
@@ -217,16 +228,33 @@ class Protokolle {
 	$query = "SELECT " . $erg . " FROM protokolle JOIN gebiet ON "
 		. "(protokolle.gebiet = gebiet.id) JOIN pruefungpruefer ON "
 		. "(protokolle.id = protokollid) JOIN pruefer ON "
-		. "(pruefungpruefer.prueferid = pruefer.id) GROUP BY " . $col;
+		. "(pruefungpruefer.prueferid = pruefer.id)";
+		
+	$param = array();
+	if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
+	    $query .= " WHERE vertiefungsgebiet ILIKE :vorlesung";
+	    $param[":vorlesung"] = "%" . $_GET["vorlesung"] . "%";
+	}
+	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+	    $query .= " WHERE pruefername ILIKE :prof";
+	    $param[":prof"] = "%" . $_GET["prof"] . "%";
+	}
+	
+	$query .= " GROUP BY " . $col;
+	
 
-	$stmt = $db->query($query);
+	$stmt = $db->query($query, $param);
+	
+	
 
 	if (isset($table) && !empty($table)) {
 	    $output->add($table, $stmt->fetchAll(PDO::FETCH_ASSOC));
+	    $output->addStatus($table, $stmt->errorInfo());
 	    return;
 	}
-
+	$output->addStatus($col, $stmt->errorInfo());
 	$output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
+	$stmt->closeCursor();
     }
 
 }

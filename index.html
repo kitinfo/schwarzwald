@@ -31,10 +31,12 @@ and open the template in the editor.
 			<input type="number" id="limitInput" value="0" />
 		    </div>
 		    <label for="searchInput">Suche: 
-			<input type="text" list="lecturesList" id="searchInput"  placeholder="Vorlesung" value=""/>
+			<input type="text" list="lecturesList" id="searchInput"
+			       onchange="fsdeluxe.exams.getProfs()" placeholder="Vorlesung" value=""/>
 		    </label>
-		    <label for="searchInput">Prof: 
-			<input type="text" list="profList" id="profInput"  placeholder="Prof" value=""/>
+		    <label for="profInput">Prof: 
+			<input type="text" list="profList" id="profInput"
+			       onchange="fsdeluxe.exams.getLectures()" placeholder="Prof" value=""/>
 		    </label>
 		    <datalist id="lecturesList"></datalist>
 		    <datalist id="profList"></datalist>

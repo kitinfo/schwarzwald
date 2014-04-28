@@ -31,6 +31,9 @@ table {
 tfoot {
     border-top: 1px solid black;
 }
+thead {
+    border-bottom: 1px solid black;
+}
 
 #limit {
     float: right;
@@ -65,10 +68,6 @@ table {
     width: 100%;
     text-align: center;
     border-collapse: collapse;
-}
-
-tfoot {
-    border-top: 1px solid black;
 }
 
 .colLectures {
@@ -111,4 +110,11 @@ table tbody tr::before {
     display: table-cell;
     text-align: center;
     vertical-align: inherit;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #ddd;
+}
+tbody tr:nth-child(even) {
+    background-color: #eee;
 }

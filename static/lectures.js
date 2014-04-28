@@ -3,6 +3,12 @@ if (!window.fsdeluxe) {
     var fsdeluxe = {};
 }
 
+var gui = {
+    lm: function(elem) {
+	return document.getElementById(elem);
+    }
+};
+
 fsdeluxe.exams = {
     /**
      * api url
@@ -87,7 +93,7 @@ fsdeluxe.exams = {
 	checkboxCol: function(val, place) {
 	    var tdCheck = document.createElement('td');
 	    var checkbox = document.createElement('input');
-	    var checked = document.getElementById("allCheckbox").checked;
+	    var checked = gui.lm("allCheckbox").checked;
 	    checkbox.setAttribute('type', 'checkbox');
 	    if (checked) {
 		checkbox.setAttribute('checked', checked);
@@ -147,8 +153,8 @@ fsdeluxe.exams = {
 	    return;
 	}
 	var data = JSON.parse(xhr.response);
-	document.getElementById(self.statusTag).textContent = xhr.status;
-	var outputTable = document.getElementById(self.searchOutputTBody);
+	gui.lm(self.statusTag).textContent = xhr.status;
+	var outputTable = gui.lm(self.searchOutputTBody);
 	outputTable.innerHTML = "";
 	self.searchElements = [];
 	var type = "";
@@ -182,7 +188,7 @@ fsdeluxe.exams = {
 
 	var self = fsdeluxe.exams;
 	var checkboxes = document.getElementsByClassName('searchCheckbox');
-	var checked = document.getElementById("allCheckbox").checked;
+	var checked = gui.lm("allCheckbox").checked;
 	for (var i = 0; i < checkboxes.length; i++) {
 	    checkboxes[i].checked = checked;
 	}
@@ -201,23 +207,10 @@ fsdeluxe.exams = {
 
 	self.calcPrice("search");
     },
-    /**
-     * Fills the datalist with data from server
-     * @param {XMLHttpRequest} xhr response from server
-     * @returns {void}
-     */
-    fillLectureDatalist: function(xhr) {
-	var datalist = document.getElementById("lecturesList");
-	fsdeluxe.exams.fillDatalist(datalist, "vorlesung", xhr);
-    },
-    fillProfDatalist: function(xhr) {
-	var datalist = document.getElementById("profList");
-	fsdeluxe.exams.fillDatalist(datalist, "prof", xhr);
-    },
     fillDatalist: function(datalist, tag, xhr) {
 	var self = fsdeluxe.exams;
 	var v = JSON.parse(xhr.response);
-	document.getElementById(self.statusTag).textContent = xhr.status;
+	gui.lm(self.statusTag).textContent = xhr.status;
 	datalist.innerHTML = "";
 	v[tag].forEach(function(val) {
 	    var item = document.createElement('option');
@@ -231,10 +224,10 @@ fsdeluxe.exams = {
      */
     search: function() {
 	var self = fsdeluxe.exams;
-	var searchString = document.getElementById(self.searchTag).value;
-	var limit = document.getElementById(self.limitTag).value;
-	var type = document.getElementById("typeSelector").value;
-	var prof = document.getElementById("profInput").value;
+	var searchString = gui.lm(self.searchTag).value;
+	var limit = gui.lm(self.limitTag).value;
+	var type = gui.lm("typeSelector").value;
+	var prof = gui.lm("profInput").value;
 	ajax.asyncGet(this.apiUrl + "?" + type
 		+ "&search=" + searchString
 		+ "&prof=" + prof
@@ -248,15 +241,23 @@ fsdeluxe.exams = {
      */
     getLectures: function() {
 	var self = fsdeluxe.exams;
-	var elem = document.getElementById("typeSelector");
+	var elem = gui.lm("typeSelector");
 	ajax.asyncGet(this.apiUrl + "?" + elem.value
-		+ "&vorlesungen", self.fillLectureDatalist, self.error);
+		+ "&vorlesungen"
+		+ "&prof=" + gui.lm("profInput").value
+		, function(xhr) {
+		    self.fillDatalist(gui.lm("lecturesList"), "vorlesung", xhr);
+		}, self.error);
     },
     getProfs: function() {
 	var self = fsdeluxe.exams;
-	var elem = document.getElementById("typeSelector");
+	var elem = gui.lm("typeSelector");
 	ajax.asyncGet(this.apiUrl + "?" + elem.value
-		+ "&profs", self.fillProfDatalist, self.error);
+		+ "&profs"
+		+ "&vorlesung=" + gui.lm("searchInput").value
+		, function(xhr) {
+		    fsdeluxe.exams.fillDatalist(gui.lm("profList"), "prof", xhr);
+		}, self.error);
     },
     /**
      * Calculates the price for all checked lectures.
@@ -265,21 +266,21 @@ fsdeluxe.exams = {
      */
     calcPrice: function(place) {
 	var self = fsdeluxe.exams;
-	var sumElem = document.getElementById(place + 'Sum');
-	var counterElem = document.getElementById(place + 'Counter');
+	var sumElem = gui.lm(place + 'Sum');
+	var counterElem = gui.lm(place + 'Counter');
 	var counter = 0;
 	var sum = 0.00;
 	var calc;
 	if (place === "cart") {
 
 	    calc = function(val) {
-		var elemCounter = +(document.getElementById("cartCounter" + val.id).value);
+		var elemCounter = +(gui.lm("cartCounter" + val.id).value);
 		sum += val.seiten * self.pagePrice * elemCounter;
 		counter += elemCounter;
 	    };
 	} else {
 	    calc = function(val) {
-		if (document.getElementById(place + 'Checkbox' + val.id).checked) {
+		if (gui.lm(place + 'Checkbox' + val.id).checked) {
 		    sum += (val.seiten * self.pagePrice);
 		    counter++;
 		}
@@ -299,7 +300,7 @@ fsdeluxe.exams = {
     error: function(xhr) {
 	console.log("Error getting request");
 	console.log(xhr);
-	document.getElementById("status").textContent = xhr.responseText;
+	gui.lm("status").textContent = xhr.responseText;
     },
     addToCart: function() {
 	var self = fsdeluxe.exams;
@@ -360,17 +361,17 @@ fsdeluxe.exams = {
      */
     remCart: function() {
 	var self = fsdeluxe.exams;
-	var id = document.getElementById(self.cartRemoveInput).value;
-	var row = document.getElementById("cartRow" + id);
-	document.getElementById(self.cartTableBody).removeChild(row);
+	var id = gui.lm(self.cartRemoveInput).value;
+	var row = gui.lm("cartRow" + id);
+	gui.lm(self.cartTableBody).removeChild(row);
 	self.cartElements.splice(id, id);
 	self.calcPrice("cart");
     },
     typeChanged: function() {
 	fsdeluxe.exams.getLectures();
 	fsdeluxe.exams.getProfs();
-	var elem = document.getElementById("typeSelector");
-	document.getElementById("headerTitle").textContent = elem.options[elem.selectedIndex].text;
+	var elem = gui.lm("typeSelector");
+	gui.lm("headerTitle").textContent = elem.options[elem.selectedIndex].text;
     }
 };
 // begin with Lectures
