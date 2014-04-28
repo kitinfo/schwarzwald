@@ -169,21 +169,22 @@ class Protokolle {
     public function getAll() {
 
 	global $db, $output;
-	/*
-	$query = "SELECT protokolle.id, pruefername AS prof,datum, seiten, "
-		. "vertiefungsgebiet as vorlesung, '' AS kommentar FROM protokolle JOIN gebiet "
-		. "ON (protokolle.gebiet = gebiet.id) "
-		. "JOIN pruefungpruefer ON "
-		. "(protokolle.id = protokollid) JOIN pruefer ON "
-		. "(pruefungpruefer.prueferid = pruefer.id)";
-	 * 
-	 */
 	
+	/*
 	$query = "SELECT protokolle.id AS id, datum, seiten, dozent AS prof, vorlesung FROM protokolle"
 	. " JOIN pruefungvorlesung"
 		. " ON (protokollid = protokolle.id)"
 	. " JOIN vorlesungen"
 	    . " ON (vorlesungen.id = vorlesungsid)";
+	*/
+	
+	$query = "SELECT protokolle.id AS id, datum, seiten, "
+		. "string_agg(dozent, ', ') AS prof, "
+		. "string_agg(vorlesung, ', ') AS vorlesung FROM protokolle"
+	. " JOIN pruefungvorlesung"
+	.	" ON (protokollid = protokolle.id)"
+	. " JOIN vorlesungen"
+	.	" ON (vorlesungen.id = vorlesungsid)";
 	
 	$db->setOrder("datum", "DESC");
 
@@ -192,13 +193,15 @@ class Protokolle {
 	    $query .= " WHERE pruefername ILIKE :prof";
 	    $param[":prof"] = "%" . $_GET["prof"] . "%";
 	}
+	
+	$query .= " GROUP BY protokolle.id";
 
 	$stm = $db->query($query, $param);
 
 	$output->addStatus("search", $stm->errorInfo());
 	if ($stm !== null) {
 
-	    $output->add("search", $this->parse($stm->fetchAll(PDO::FETCH_ASSOC)));
+	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
 
 	    $stm->closeCursor();
 	}
@@ -211,11 +214,13 @@ class Protokolle {
 	if (empty($search)) {
 	    return $this->getAll();
 	} else {
-	    $query = "SELECT protokolle.id AS id, datum, seiten, dozent AS prof, vorlesung FROM protokolle"
+	    $query = "SELECT protokolle.id AS id, datum, seiten, "
+		. "string_agg(dozent, ', ') AS prof, "
+		. "string_agg(vorlesung, ', ') AS vorlesung FROM protokolle"
 	. " JOIN pruefungvorlesung"
-		. " ON (protokollid = protokolle.id)"
-	. " JOIN vorlesungen"
-	    . " ON (vorlesungen.id = vorlesungsid) WHERE vorlesungen.vorlesung ILIKE :vorlesung";
+	.	" ON (protokollid = protokolle.id)"
+	. " JOIN vorlesungen" 
+	.	" ON (vorlesungen.id = vorlesungsid)";
 
 	    $searchNew = "%" . $search . "%";
 	    $param = array(
@@ -226,14 +231,18 @@ class Protokolle {
 		$query .= " AND pruefername ILIKE :prof";
 		$param[":prof"] = "%" . $_GET["prof"] . "%";
 	    }
-
+	    
+	    $query .= " GROUP BY protokolle.id";
+		
+	    $query .= " HAVING string_agg(vorlesungen.vorlesung, ', ') ILIKE :vorlesung";
+	    
 	    $db->setOrder("datum", "DESC");
 	    $stm = $db->query($query, $param);
 	}
 	$output->addStatus("search", $stm->errorInfo());
 	if ($stm !== false) {
 
-	    $output->add("search", $this->parse($stm->fetchAll(PDO::FETCH_ASSOC)));
+	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
 	    $stm->closeCursor();
 	}
     }
