@@ -69,8 +69,8 @@ fsdeluxe.exams = {
 	    var tdType = document.createElement('td');
 	    tdType.classList.add('colType');
 	    tdType.textContent = type;
-	    
-	    
+
+
 	    return tdType;
 	},
 	/**
@@ -81,7 +81,19 @@ fsdeluxe.exams = {
 	lecturesCol: function(val) {
 	    var tdLectures = document.createElement('td');
 	    tdLectures.classList.add('colLectures');
-	    tdLectures.textContent = val.vorlesung;
+
+
+	    if (typeof val.prof === 'string') {
+		tdLectures.textContent = val.vorlesung;
+	    } else {
+		var ul = document.createElement('ul');
+		val.vorlesung.forEach(function(val) {
+		    var li = document.createElement('li');
+		    li.textContent = val;
+		    ul.appendChild(li);
+		});
+		tdLectures.appendChild(ul);
+	    }
 	    return tdLectures;
 	},
 	/**
@@ -127,7 +139,17 @@ fsdeluxe.exams = {
 	profCol: function(val) {
 	    var tdProf = document.createElement('td');
 	    tdProf.classList.add('colProf');
-	    tdProf.textContent = val.prof;
+	    if (typeof val.prof === 'string') {
+		tdProf.textContent = val.prof;
+	    } else {
+		var ul = document.createElement('ul');
+		val.prof.forEach(function(val) {
+		    var li = document.createElement('li');
+		    li.textContent = val;
+		    ul.appendChild(li);
+		});
+		tdProf.appendChild(ul);
+	    }
 	    return tdProf;
 	},
 	/**
@@ -159,25 +181,30 @@ fsdeluxe.exams = {
 	self.searchElements = [];
 	var type = "";
 	self.TYPE.forEach(function(val) {
-		if (val.id === data.type) {
-		    type = val;
-		}
-	    });
-	data.search.forEach(function(val) {
-	    var tr = document.createElement('tr');
-	    tr.classList.add('searchRow' + val.id);
-	    tr.appendChild(self.columns.checkboxCol(val, "search"));
-	    tr.appendChild(self.columns.idCol(val));
-	    tr.appendChild(self.columns.typeCol(type.name));
-	    tr.appendChild(self.columns.lecturesCol(val));
-	    tr.appendChild(self.columns.datumCol(val));
-	    tr.appendChild(self.columns.profCol(val));
-	    tr.appendChild(self.columns.pageCol(val));
-	    tr.appendChild(self.columns.priceCol(val));
-	    outputTable.appendChild(tr);
-	    val.type = type;
-	    self.searchElements.push(val);
+	    if (val.id === data.type) {
+		type = val;
+	    }
 	});
+
+	for (var index in data.search) {
+	    if (data.search.hasOwnProperty(index)) {
+		var val = data.search[index];
+
+		var tr = document.createElement('tr');
+		tr.classList.add('searchRow' + val.id);
+		tr.appendChild(self.columns.checkboxCol(val, "search"));
+		tr.appendChild(self.columns.idCol(val));
+		tr.appendChild(self.columns.typeCol(type.name));
+		tr.appendChild(self.columns.lecturesCol(val));
+		tr.appendChild(self.columns.datumCol(val));
+		tr.appendChild(self.columns.profCol(val));
+		tr.appendChild(self.columns.pageCol(val));
+		tr.appendChild(self.columns.priceCol(val));
+		outputTable.appendChild(tr);
+		val.type = type;
+		self.searchElements.push(val);
+	    }
+	}
 	self.calcPrice("search");
     },
     /**
