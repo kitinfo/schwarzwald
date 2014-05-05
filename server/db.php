@@ -66,18 +66,42 @@ class Klausuren {
 	    return $this->getAll();
 	} else {
 	    $sql = "SELECT id, vorlesung, datum, prof, kommentar, seiten "
-		    . "FROM public.klausuren WHERE vorlesung ILIKE :p1 AND "
-		    . "veraltet = false";
+		    . "FROM public.klausuren "
+                    . "WHERE veraltet = false";
 
-	    $klausurenMit = "%" . $klausuren . "%";
-	    $param = array(
-		":p1" => $klausurenMit
-	    );
+	    $param = array();
 
 	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
 		$sql .= " AND prof ILIKE :prof";
-		$param[":prof"] = "%" . $_GET["prof"] . "%";
+		$param[":prof"] = $_GET["prof"];
 	    }
+            
+            $searchNew = explode(";AND;", $klausuren);
+            
+            $oCounter = 0;
+	    
+	    for ($i = 0; $i < count($searchNew); $i++) {
+		
+		$sql .= " AND";
+		
+		$sql .= " (";
+		
+		$in = explode(";OR;",$searchNew[$i]);
+		
+		for ($j = 0; $j < count($in); $j++) {
+		    
+		    if ($j != 0) {
+			$sql .= " OR";
+		    }
+		    
+		    $sql .= " vorlesung ILIKE :v" . $oCounter;
+		    $param[":v" . $oCounter] = $in[$j];
+		    $oCounter++;
+		}
+		
+		$sql .= ")";
+	    }
+            
 	    $db->setOrder("datum", "DESC");
 
 	    $stm = $db->query($sql, $param);
@@ -100,6 +124,10 @@ class Klausuren {
 	    $sql .= " AND prof ILIKE :prof";
 	    $param[":prof"] = $_GET["prof"];
 	}
+       
+        
+        
+        
 
 	$db->setOrder("datum", "DESC");
 	$stm = $db->query($sql, $param);
@@ -126,11 +154,11 @@ class Klausuren {
 	$param = array();
 	if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
 	    $query .= " WHERE vorlesung ILIKE :vorlesung";
-	    $param[":vorlesung"] = "%" . $_GET["vorlesung"] . "%";
+	    $param[":vorlesung"] = $_GET["vorlesung"];
 	}
 	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
 	    $query .= " WHERE prof ILIKE :prof";
-	    $param[":prof"] = "%" . $_GET["prof"] . "%";
+	    $param[":prof"] = $_GET["prof"];
 	}
 	
 	$query .= " GROUP BY " . $col;
@@ -169,7 +197,7 @@ class Protokolle {
 	$param = array();
 	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
 	    $query .= " WHERE dozent ILIKE :prof";
-	    $param[":prof"] = "%" . $_GET["prof"] . "%";
+	    $param[":prof"] = $_GET["prof"];
 	}
 	
 	$query .= " GROUP BY protokolle.id";
@@ -227,7 +255,7 @@ class Protokolle {
 		    }
 		    
 		    $query .= " string_agg(vorlesungen.vorlesung, ', ') ILIKE :v" . $oCounter;
-		    $param[":v" . $oCounter] = "%" . $in[$j] . "%";
+		    $param[":v" . $oCounter] = $in[$j];
 		    $oCounter++;
 		}
 		
@@ -239,7 +267,7 @@ class Protokolle {
 	    
 	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
 		$query .= " AND string_agg(dozent, ',') ILIKE :prof";
-		$param[":prof"] = "%" . $_GET["prof"] . "%";
+		$param[":prof"] = $_GET["prof"];
 	    }
 	    
 	    $db->setOrder("datum", "DESC");
@@ -282,19 +310,18 @@ class Protokolle {
 	$param = array();
 	if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
 	    $query .= " WHERE vorlesung ILIKE :vorlesung";
-	    $param[":vorlesung"] = "%" . $_GET["vorlesung"] . "%";
+	    $param[":vorlesung"] = $_GET["vorlesung"];
 	}
 	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
 	    $query .= " WHERE dozent ILIKE :prof";
-	    $param[":prof"] = "%" . $_GET["prof"] . "%";
+	    $param[":prof"] = $_GET["prof"];
 	}
 	
 	$query .= " GROUP BY " . $col;
-	
+        
+        $db->setOrder($col,"ASC");
 
 	$stmt = $db->query($query, $param);
-	
-	
 
 	if (isset($table) && !empty($table)) {
 	    $output->add($table, $stmt->fetchAll(PDO::FETCH_ASSOC));
