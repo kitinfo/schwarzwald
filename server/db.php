@@ -143,28 +143,6 @@ class Klausuren {
 }
 
 class Protokolle {
-
-    public function parse($data) {
-	
-	$hashMap = array();
-	
-	
-	foreach ($data as $elem) {
-	    $id = $elem["id"];
-	    if (!$hashMap[$elem["id"]]) {
-		$hashMap[$elem["id"]] = $elem;
-		$hashMap[$id]["prof"] = array($elem["prof"]);
-		$hashMap[$id]["vorlesung"] = array($elem["vorlesung"]);
-	    } else {
-		$hashMap[$id]["prof"][] = $elem["prof"];
-		$hashMap[$id]["vorlesung"][] = $elem["vorlesung"];
-	    }
-	}
-	
-	return $hashMap;
-    }
-    
-    
     
     public function getAll() {
 
@@ -260,7 +238,7 @@ class Protokolle {
 	    //$query .= " HAVING string_agg(vorlesungen.vorlesung, ', ') ILIKE :vorlesung";
 	    
 	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-		$query .= " AND string_agg(pruefername, ',') ILIKE :prof";
+		$query .= " AND string_agg(dozent, ',') ILIKE :prof";
 		$param[":prof"] = "%" . $_GET["prof"] . "%";
 	    }
 	    
@@ -430,8 +408,12 @@ class Output {
      */
     public function addStatus($table, $output) {
 
-	if ($output[1]) {
-	    $this->retVal["status"]["debug"][] = $output;
+	if (is_array($output) && $output[1]) {
+            if (is_array($retVal["status"]["debug"])) {
+                $this->retVal["status"]["debug"][] = $output;
+            } else {
+                $retVal["status"]["debug"] = array($output);
+            }
 	    $this->retVal["status"]["db"] = "failed";
 	}
 

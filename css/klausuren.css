@@ -112,11 +112,11 @@ table tbody tr::before {
     vertical-align: inherit;
 }
 
-tbody tr:nth-child(odd) {
-    background-color: #ddd;
-}
+//tbody tr:nth-child(odd) {
+//    background-color: #ddd;
+//}
 tbody tr:nth-child(even) {
-    background-color: #eee;
+    background-color: #ddd;
 }
 
 .colDatum {
