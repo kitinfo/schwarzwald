@@ -168,7 +168,7 @@ class Protokolle {
 
 	$param = array();
 	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-	    $query .= " WHERE pruefername ILIKE :prof";
+	    $query .= " WHERE dozent ILIKE :prof";
 	    $param[":prof"] = "%" . $_GET["prof"] . "%";
 	}
 	
@@ -344,7 +344,7 @@ class DB {
 
 	    $sql .= $this->order;
 
-	    if ($_GET["limit"] && !empty($_GET["limit"])) {
+	    if (isset($_GET["limit"]) && !empty($_GET["limit"])) {
 		$sql .= " LIMIT :limit";
 		$params[":limit"] = $_GET["limit"];
 	    }

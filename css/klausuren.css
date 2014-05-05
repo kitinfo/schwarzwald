@@ -16,16 +16,35 @@ body {
     border-radius: 10px;
 }
 
-header h1 {
+header {
     text-align: center;
     font-size: 2em;
     font-weight: bold;
+    vertical-align: bottom;
+}
+
+#headerTitle {
+    vertical-align: super;
+}
+
+.clear {
+    clear: both;
 }
 
 table {
     width: 100%;
     text-align: center;
     border-collapse: collapse;
+}
+
+label {
+    float: left;
+    display: inline-block;
+    font-size: 0.8em;
+}
+
+label .text {
+    margin-left: 0.5em;
 }
 
 tfoot {
@@ -122,4 +141,29 @@ tbody tr:nth-child(even) {
 .colDatum {
     min-width: 5em;
     max-width: 5em;
+}
+
+#logo {
+    width: 2em;
+}
+
+#typeSelector {
+    float: right;
+}
+
+#searchInputs {
+    display: inline-block;
+}
+
+.searchInput {
+    display: block;
+}
+
+.button {
+    display: inline-block;
+    text-align: center;
+    font-size: 1.5em;
+}
+#searchInputs select {
+    width: 4em;
 }

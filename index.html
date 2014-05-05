@@ -11,13 +11,14 @@ and open the template in the editor.
 	<meta name="viewport" content="width=device-width">
 
 	<link rel="stylesheet" type="text/css" href="css/klausuren.css" />
-	<script src="static/sort.js"></script>
     </head>
     <body>
 	<div id="status"></div>
 	<header>
-	    <h1 id="headerTitle"></h1>
+            <img src="static/schwarzwald.svg" id="logo" alt="logo" />
+	    <span id="headerTitle"></span>
 	</header>
+        <div class="clear"></div>
 
 	<nav></nav>
 
@@ -26,26 +27,34 @@ and open the template in the editor.
 	    <div id="search">
 		<form id="searchForm" action="javascript:;" onsubmit="fsdeluxe.exams.search()">
 
-		    <div id="limit">
-			<label for="limitInput">Limit: </label>
-			<input type="number" id="limitInput" value="0" />
-		    </div>
-		    <label for="searchInput">Suche: 
-			<input type="text" list="lecturesList" id="searchInput"
-			       onchange="fsdeluxe.exams.getProfs()" placeholder="Vorlesung" value=""/>
-		    </label>
-		    <label for="profInput">Prof: 
-			<input type="text" list="profList" id="profInput"
-			       onchange="fsdeluxe.exams.getLectures()" placeholder="Prof" value=""/>
-		    </label>
-		    <datalist id="lecturesList"></datalist>
-		    <datalist id="profList"></datalist>
-		    <input type="submit" value="Suche" id="searchButton" />
-                    <span style="width:2em"></span>
+		    
                     <select id="typeSelector" onchange="fsdeluxe.exams.typeChanged()">
                         <option value="p">Protokolle</option>
                         <option value="k">Klausuren</option>
                     </select>
+                    <div class="clear"></div>
+                    <label for="profInput"><span class="text">Prof:</span> <br />
+			<input type="text" list="profList" id="profInput"
+			       onchange="fsdeluxe.exams.getLectures()" placeholder="Prof" value=""/>
+		    </label>
+                    <label for="searchInput"><span class="text">Suche:</span> <br />
+                        <span id="searchInputs">
+			<input type="text" list="lecturesList" id="searchInput0"
+			       onchange="fsdeluxe.exams.getProfs()" placeholder="Vorlesung"/>
+                        </span>
+                        <span class="button" onclick="fsdeluxe.gui.addSearchField()">[+]</span>
+		    </label>
+                    
+                    <div class="clear"></div>
+		    <datalist id="lecturesList"></datalist>
+		    <datalist id="profList"></datalist>
+		    <input type="submit" value="Suche" id="searchButton" />
+                    <div id="limit">
+                        <label for="limitInput"><span class="text">Limit:</span>
+                            <input type="number" id="limitInput" value="0" />
+                        </label>
+		    </div>
+                    <span style="width:2em"></span>
 
 		</form>
 
