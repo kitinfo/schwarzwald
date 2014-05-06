@@ -281,11 +281,19 @@ fsdeluxe.exams = {
         var limit = gui.lm(self.limitTag).value;
         var type = gui.lm("typeSelector").value;
         var prof = gui.lm("profInput").value;
-        ajax.asyncGet(this.apiUrl + "?" + type
+        
+        var url = this.apiUrl + "?" + type
                 + "&search=" + searchString
                 + "&prof=" + prof
-                + "&limit=" + limit,
-                self.fillExams, self.error);
+                + "&limit=" + limit;
+        if (gui.lm("newest").value !== "") {
+            url += "&newest=" + gui.lm("newest").value;
+        }
+        if (gui.lm("oldest").value !== "") {
+            url += "&oldest=" + gui.lm("oldest").value;
+        }
+        
+        ajax.asyncGet(url, self.fillExams, self.error);
         return true;
     },
     /**

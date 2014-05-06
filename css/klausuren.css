@@ -167,3 +167,11 @@ tbody tr:nth-child(even) {
 #searchInputs select {
     width: 4em;
 }
+
+#timestampBox {
+    float:right;
+}
+
+.timestamp {
+    width: 6em;
+}

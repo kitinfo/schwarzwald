@@ -11,6 +11,7 @@ and open the template in the editor.
 	<meta name="viewport" content="width=device-width">
 
 	<link rel="stylesheet" type="text/css" href="css/klausuren.css" />
+	<link rel="stylesheet" type="text/css" href="css/pikaday.css" />
     </head>
     <body>
 	<div id="status"></div>
@@ -44,6 +45,17 @@ and open the template in the editor.
                         </span>
                         <span class="button" onclick="fsdeluxe.gui.addSearchField()">[+]</span>
 		    </label>
+                   
+                    <div id="timestampBox">
+                    <label for="newest"><span class="text">Neustes:</span> <br />
+			<input type="text"  id="newest" class="timestamp"
+			       placeholder="JJJJ-MM-TT"/>
+		    </label>
+                        <label for="oldest"><span class="text">Ältestes:</span> <br />
+			<input type="text"  id="oldest" class="timestamp"
+			       placeholder="JJJJ-MM-TT"/>
+		    </label>
+                    </div>
                     
                     <div class="clear"></div>
 		    <datalist id="lecturesList"></datalist>
@@ -108,5 +120,11 @@ and open the template in the editor.
 
 	<script src="static/ajax.js"></script>
 	<script src="static/lectures.js"></script>
+        <script src="static/moments.js"></script>
+        <script src="static/pickaday.js"></script>
+        <script>
+            var pickerNewest = new Pikaday({field: gui.lm('newest'), format: 'YYYY-MM-DD'});
+            var pickerOldest = new Pikaday({field: gui.lm('oldest'), format: 'YYYY-MM-DD'});
+        </script>
     </body>
 </html>
