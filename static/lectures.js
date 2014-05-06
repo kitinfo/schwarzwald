@@ -87,7 +87,7 @@ fsdeluxe.exams = {
             var tdLectures = document.createElement('td');
             tdLectures.classList.add('colLectures');
             //if (typeof val.prof === 'string') {
-            tdLectures.textContent = val.vorlesung;
+            tdLectures.innerText = val.vorlesung;
             /*} else {
              var ul = document.createElement('ul');
              val.vorlesung.forEach(function(val) {
@@ -143,7 +143,7 @@ fsdeluxe.exams = {
             var tdProf = document.createElement('td');
             tdProf.classList.add('colProf');
             //if (typeof val.prof === 'string') {
-            tdProf.textContent = val.prof;
+            tdProf.innerText = val.prof;
             /*} else {
              var ul = document.createElement('ul');
              val.prof.forEach(function(val) {
