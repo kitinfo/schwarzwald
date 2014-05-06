@@ -217,9 +217,13 @@ class Protokolle {
 
 	global $db, $output, $orderBy;
 
+        
 	if (empty($search)) {
 	    return $this->getAll();
 	} else {
+            
+            $output->addStatus("searchInput", $search);
+            
 	    $query = "SELECT protokolle.id AS id, datum, seiten, "
 		. "string_agg(DISTINCT dozent, ', ') AS prof, "
 		. "string_agg(DISTINCT vorlesung, ', ') AS vorlesung FROM protokolle"
@@ -254,7 +258,7 @@ class Protokolle {
 			$query .= " OR";
 		    }
 		    
-		    $query .= " string_agg(vorlesungen.vorlesung, ', ') ILIKE :v" . $oCounter;
+		    $query .= " :v" . $oCounter . " ILIKE ANY(array_agg(vorlesungen.vorlesung))";
 		    $param[":v" . $oCounter] = $in[$j];
 		    $oCounter++;
 		}
@@ -262,8 +266,6 @@ class Protokolle {
 		$query .= ")";
 	    }
 	    $output->addStatus("debug", $query);
-		
-	    //$query .= " HAVING string_agg(vorlesungen.vorlesung, ', ') ILIKE :vorlesung";
 	    
 	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
 		$query .= " AND string_agg(dozent, ',') ILIKE :prof";

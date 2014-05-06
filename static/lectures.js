@@ -253,6 +253,12 @@ fsdeluxe.exams = {
             datalist.appendChild(item);
         });
     },
+    encode: function(string) {
+        var encoded = string.replace(/"%"/g, "&#037;");
+        console.log(encoded);
+        
+        return encoded;
+    },
     /**
      * starts a search action
      * @returns {void}
@@ -267,7 +273,7 @@ fsdeluxe.exams = {
             var tag = searchTags[i];
             if (tag.getElementsByTagName("input")[0].value !== "") {
                 searchString += tag.getElementsByTagName("select")[0].value;
-                searchString += tag.getElementsByTagName("input")[0].value;
+                searchString += self.encode(tag.getElementsByTagName("input")[0].value);
             }
         }
         console.log(searchString);
