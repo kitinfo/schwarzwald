@@ -75,6 +75,15 @@ class Klausuren {
 		$sql .= " AND prof ILIKE :prof";
 		$param[":prof"] = $_GET["prof"];
 	    }
+            if (isset($_GET["newest"]) && !empty($_GET["newest"])) {
+                $sql .= " AND datum <= :newest";
+                $param[":newest"] = $_GET["newest"];
+                $whereFlag = true;
+            }
+            if (isset($_GET["oldest"]) && !empty($_GET["oldest"])) {
+                $sql .= " AND datum >= :oldest";
+                $param[":oldest"] = $_GET["oldest"];
+            }
             
             $searchNew = explode(";AND;", $klausuren);
             
@@ -233,6 +242,25 @@ class Protokolle {
 	.	" ON (vorlesungen.id = vorlesungsid)";
 	    
 	    $param = array();
+            
+            
+            if (isset($_GET["newest"]) && !empty($_GET["newest"])) {
+                $query .= " WHERE datum <= :newest";
+                $param[":newest"] = $_GET["newest"];
+                $whereFlag = true;
+            }
+            if (isset($_GET["oldest"]) && !empty($_GET["oldest"])) {
+                
+                if (!$whereFlag) {
+                    $query .= " WHERE";
+                } else {
+                    $query .= " AND";
+                }
+                $query .= " datum >= :oldest";
+                
+                $param[":oldest"] = $_GET["oldest"];
+            }
+            
 
 	    $query .= " GROUP BY protokolle.id";
 	    
