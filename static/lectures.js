@@ -16,7 +16,6 @@ var gui = {
         return option;
     }
 };
-
 fsdeluxe.exams = {
     /**
      * api url
@@ -77,8 +76,6 @@ fsdeluxe.exams = {
             var tdType = document.createElement('td');
             tdType.classList.add('colType');
             tdType.textContent = type;
-
-
             return tdType;
         },
         /**
@@ -89,8 +86,6 @@ fsdeluxe.exams = {
         lecturesCol: function(val) {
             var tdLectures = document.createElement('td');
             tdLectures.classList.add('colLectures');
-
-
             //if (typeof val.prof === 'string') {
             tdLectures.textContent = val.vorlesung;
             /*} else {
@@ -176,6 +171,11 @@ fsdeluxe.exams = {
         {id: 0, name: "Protokoll"},
         {id: 1, name: "Klausur"}
     ],
+    toggleCheckbox: function(id) {
+        var checkbox = gui.lm('searchCheckbox' + id);
+        checkbox.checked = !checkbox.checked;
+        fsdeluxe.exams.calcPrice('search');
+    },
     fillExams: function(xhr) {
 
         var self = fsdeluxe.exams;
@@ -193,13 +193,12 @@ fsdeluxe.exams = {
                 type = val;
             }
         });
-
         for (var index in data.search) {
             if (data.search.hasOwnProperty(index)) {
                 var val = data.search[index];
-
                 var tr = document.createElement('tr');
                 tr.classList.add('searchRow' + val.id);
+                tr.setAttribute('onclick', "fsdeluxe.exams.toggleCheckbox(" + val.id + ")");
                 tr.appendChild(self.columns.checkboxCol(val, "search"));
                 tr.appendChild(self.columns.idCol(val));
                 tr.appendChild(self.columns.typeCol(type.name));
@@ -256,7 +255,6 @@ fsdeluxe.exams = {
     encode: function(string) {
         var encoded = string.replace(/"%"/g, "&#037;");
         console.log(encoded);
-        
         return encoded;
     },
     /**
@@ -265,10 +263,8 @@ fsdeluxe.exams = {
      */
     search: function() {
         var self = fsdeluxe.exams;
-
         var searchTags = document.getElementsByClassName(self.searchTag);
         var searchString = gui.lm(self.searchTag + "0").value;
-
         for (var i = 0; i < searchTags.length; i++) {
             var tag = searchTags[i];
             if (tag.getElementsByTagName("input")[0].value !== "") {
@@ -277,11 +273,9 @@ fsdeluxe.exams = {
             }
         }
         console.log(searchString);
-
         var limit = gui.lm(self.limitTag).value;
         var type = gui.lm("typeSelector").value;
         var prof = gui.lm("profInput").value;
-        
         var url = this.apiUrl + "?" + type
                 + "&search=" + searchString
                 + "&prof=" + prof
@@ -292,7 +286,7 @@ fsdeluxe.exams = {
         if (gui.lm("oldest").value !== "") {
             url += "&oldest=" + gui.lm("oldest").value;
         }
-        
+
         ajax.asyncGet(url, self.fillExams, self.error);
         return true;
     },
@@ -435,7 +429,6 @@ fsdeluxe.exams = {
         gui.lm("headerTitle").textContent = elem.options[elem.selectedIndex].text;
     }
 };
-
 fsdeluxe.gui = {
     andorid: 1,
     addSearchField: function() {
@@ -453,23 +446,18 @@ fsdeluxe.gui = {
         option = gui.option('AND');
         option.setAttribute('value', ";AND;");
         selector.appendChild(option);
-
         span.appendChild(selector);
-
         var elem = gui.cr('input');
         elem.setAttribute('list', 'lecturesList');
         elem.onchange = fsdeluxe.exams.getProfs();
         elem.setAttribute('placeholder', 'Vorlesung');
         span.appendChild(elem);
-
         var rm = gui.cr('span');
         rm.setAttribute('class', 'button');
         rm.textContent = "[-]";
         rm.setAttribute('onclick', "fsdeluxe.gui.rmSearchField(" + (fsdeluxe.gui.andorid) + ")");
         span.appendChild(rm);
-
         gui.lm('searchInputs').appendChild(span);
-
         fsdeluxe.gui.andorid++;
     },
     rmSearchField: function(id) {
@@ -477,6 +465,5 @@ fsdeluxe.gui = {
         gui.lm('searchInputs').removeChild(gui.lm('searchInput' + id));
     }
 };
-
 // begin with Lectures
 fsdeluxe.exams.typeChanged();
