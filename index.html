@@ -6,125 +6,138 @@ and open the template in the editor.
 -->
 <html>
     <head>
-	<title>Klausuren</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width">
+        <title>Klausuren</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
 
-	<link rel="stylesheet" type="text/css" href="css/klausuren.css" />
-	<link rel="stylesheet" type="text/css" href="css/pikaday.css" />
+        <link rel="stylesheet" type="text/css" href="css/klausuren.css" />
+        <link rel="stylesheet" type="text/css" href="css/pikaday.css" />
     </head>
     <body>
-	<div id="status"></div>
-	<header>
+        <div id="status"></div>
+        <header>
             <img src="static/schwarzwald.svg" id="logo" alt="logo" />
-	    <span id="headerTitle"></span>
-	</header>
+            <span id="headerTitle"></span>
+        </header>
         <div class="clear"></div>
 
-	<nav></nav>
+        <nav></nav>
 
-	<div id="content">
+        <div id="content">
 
-	    <div id="search">
-		<form id="searchForm" action="javascript:;" onsubmit="fsdeluxe.exams.search()">
+            <div id="search">
+                <form id="searchForm" action="javascript:;" onsubmit="fsdeluxe.exams.search()">
 
-		    
+
                     <select id="typeSelector" onchange="fsdeluxe.exams.typeChanged()">
                         <option value="p">Protokolle</option>
                         <option value="k">Klausuren</option>
                     </select>
                     <div class="clear"></div>
                     <label for="profInput"><span class="text">Prof:</span> <br />
-			<input type="text" list="profList" id="profInput"
-			       onchange="fsdeluxe.exams.getLectures()" placeholder="Prof" value=""/>
-		    </label>
+                        <input type="text" list="profList" id="profInput"
+                               onchange="fsdeluxe.exams.getLectures()" placeholder="Prof" value=""/>
+                    </label>
                     <label for="searchInput"><span class="text">Suche:</span> <br />
                         <span id="searchInputs">
-			<input type="text" list="lecturesList" id="searchInput0"
-			       onchange="fsdeluxe.exams.getProfs()" placeholder="Vorlesung"/>
+                            <input type="text" list="lecturesList" id="searchInput0"
+                                   onchange="fsdeluxe.exams.getProfs()" placeholder="Vorlesung"/>
                         </span>
-                        <span class="button" onclick="fsdeluxe.gui.addSearchField()">[+]</span>
-		    </label>
-                   
+                        <span class="button" onclick="fsdeluxe.gui.addSearchField()">+</span>
+                    </label>
+
                     <div id="timestampBox">
-                    <label for="newest"><span class="text">Neustes:</span> <br />
-			<input type="text"  id="newest" class="timestamp"
-			       placeholder="JJJJ-MM-TT"/>
-		    </label>
-                        <label for="oldest"><span class="text">Ältestes:</span> <br />
-			<input type="text"  id="oldest" class="timestamp"
-			       placeholder="JJJJ-MM-TT"/>
-		    </label>
+
+                        <label for="oldest"><span class="text">Von:</span> <br />
+                            <input type="text"  id="oldest" class="timestamp"
+                                   placeholder="JJJJ-MM-TT"/>
+                        </label>
+                        <label for="newest"><span class="text">Bis:</span> <br />
+                            <input type="text"  id="newest" class="timestamp"
+                                   placeholder="JJJJ-MM-TT"/>
+                        </label>
                     </div>
-                    
+
                     <div class="clear"></div>
-		    <datalist id="lecturesList"></datalist>
-		    <datalist id="profList"></datalist>
-		    <input type="submit" value="Suche" id="searchButton" />
+                    <datalist id="lecturesList"></datalist>
+                    <datalist id="profList"></datalist>
+                    <input type="submit" value="Suche" id="searchButton" />
                     <div id="limit">
                         <label for="limitInput"><span class="text">Limit:</span>
                             <input type="number" id="limitInput" value="0" />
                         </label>
-		    </div>
-                    <span style="width:2em"></span>
+                    </div>
+                </form>
 
-		</form>
+                <div id="searchOutput" class="ouput">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="allCheckbox" onclick="fsdeluxe.exams.toggleAll()" />
+                                </th><th>ID</th><th>Type</th><th>Vorlesung</th><th>Datum</th><th>Prüfer</th><th>Seiten</th><th>Preis</th>
+                            </tr>
+                        </thead>
+                        <tbody id="searchOutputBody">
 
-		<div id="searchOutput" class="ouput">
-		    <table>
-			<thead>
-			    <tr>
-				<th>
-				    <input type="checkbox" id="allCheckbox" onclick="fsdeluxe.exams.toggleAll()" />
-				</th><th>ID</th><th>Type</th><th>Vorlesung</th><th>Datum</th><th>Prüfer</th><th>Seiten</th><th>Preis</th>
-			    </tr>
-			</thead>
-			<tbody id="searchOutputBody">
+                        </tbody>
+                        <tfoot>
+                        <td>Anzahl:</td><td id="searchCounter" class="tableLeft"></td><td></td><td></td><td></td><td class="tableRight">Gesamt: </td><td id="searchSum"></td>
+                        </tfoot>
+                    </table>
+                </div>
+                <button id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</button>
+            </div>
+            <div id="cart">
+                <div id="cartControls">
+                    <button id="cartRemoveButton" onclick="fsdeluxe.exams.remCart()" >Remove</button>
+                    <input type="text" id="cartRemoveInput" />
+                </div>
+                <div id="cartOutput" class="ouput">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th><th>Type</th><th>Anzahl</th><th>Vorlesung</th><th>Datum</th><th>Prüfer</th><th>Seiten</th><th>Preis</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartOutputBody">
 
-			</tbody>
-			<tfoot>
-			<td>Anzahl:</td><td id="searchCounter" class="tableLeft"></td><td></td><td></td><td></td><td class="tableRight">Gesamt: </td><td id="searchSum"></td>
-			</tfoot>
-		    </table>
-		</div>
-		<button id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</button>
-	    </div>
-	    <div id="cart">
-		<div id="cartControls">
-		    <button id="cartRemoveButton" onclick="fsdeluxe.exams.remCart()" >Remove</button>
-		    <input type="text" id="cartRemoveInput" />
-		</div>
-		<div id="cartOutput" class="ouput">
-		    <table>
-			<thead>
-			    <tr>
-				<th>ID</th><th>Type</th><th>Anzahl</th><th>Vorlesung</th><th>Datum</th><th>Prüfer</th><th>Seiten</th><th>Preis</th>
-			    </tr>
-			</thead>
-			<tbody id="cartOutputBody">
+                        </tbody>
+                        <tfoot>
+                        <td>Anzahl:</td><td id="cartCounter" class="tableLeft"></td><td></td><td></td><td></td><td class="tableRight">Gesamt: </td><td id="cartSum"></td>
+                        </tfoot>
+                    </table>
+                </div>
 
-			</tbody>
-			<tfoot>
-			<td>Anzahl:</td><td id="cartCounter" class="tableLeft"></td><td></td><td></td><td></td><td class="tableRight">Gesamt: </td><td id="cartSum"></td>
-			</tfoot>
-		    </table>
-		</div>
+                <div id="saveOptions">
+                    <button id="saveButton" onclick="fsdeluxe.exams.saveCart()">Save</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="cartNumber" class="hidden">
+            <div class="title">Das Speichern war erfolgreich</div>
+            <div id="cartNumberDiv">    
+                <span>Ihre Nummer:</span>
+                <span id="cartid">TEST</span>
+            </div>
+            <div id="agb">
+                <b>Weiteres Vorgehen:</b><br />
+                Mit dieser ID kannst du in der Fachschaft deine Klausuren/Protokolle
+                abholen.
+            </div>
+        </div>
 
-		<div id="saveOptions">
-		    <button id="saveButton" onclick="fsdeluxe.exams.saveCart()">Save</button>
-		</div>
-	    </div>
-	</div>
+        <footer></footer>
 
-	<footer></footer>
-
-	<script src="static/ajax.js"></script>
-	<script src="static/lectures.js"></script>
+        <script src="static/ajax.js"></script>
+        <script src="static/common.js"></script>
+        <script src="static/lectures.js"></script>
         <script src="static/moments.js"></script>
         <script src="static/pickaday.js"></script>
         <script>
-            var pickerNewest = new Pikaday({field: gui.lm('newest'), format: 'YYYY-MM-DD'});
-            var pickerOldest = new Pikaday({field: gui.lm('oldest'), format: 'YYYY-MM-DD'});
+                        var pickerNewest = new Pikaday({field: gui.lm('newest'), format: 'YYYY-MM-DD'});
+                        var pickerOldest = new Pikaday({field: gui.lm('oldest'), format: 'YYYY-MM-DD'});
         </script>
     </body>
 </html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+	<title>Klausuren</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+
+	<link rel="stylesheet" type="text/css" href="css/klausuren.css" />
+	<link rel="stylesheet" type="text/css" href="css/pikaday.css" />
+    </head>
+    <body>
+	<div id="status"></div>
+	<header>
+            <img src="static/schwarzwald.svg" id="logo" alt="logo" />
+	    <span id="headerTitle">Klausuren einplegen</span>
+	</header>
+        <div class="clear"></div>
+
+	<nav></nav>
+
+        <div id="content">
+            
+            <div>
+                <select id="klausurenListen">                      
+                    
+                </select>
+                <div class="clear"></div>
+                <label for="profInput"><span class="text">Prof:</span> <br />
+			<input type="text" list="profList" id="profInput"
+			       onchange="fsdeluxe.exams.getLectures()" placeholder="Prof" value=""/>
+		</label>
+                <label for="vorlesungInput"><span class="text">Prof:</span> <br />
+			<input type="text" list="lecturesList" id="profInput"
+			       onchange="fsdeluxe.exams.getLectures()" placeholder="Klausurenname" value=""/>
+		</label>
+                <datalist id="lecturesList"></datalist>
+		<datalist id="profList"></datalist>
+                
+                <label for="date"><span class="text">Datum:</span> <br />
+			<input type="text"  id="date" class="timestamp"
+			       placeholder="JJJJ-MM-TT"/>
+		</label>
+            </div>
+            
+        </div>
+
+	<footer></footer>
+
+	<script src="static/ajax.js"></script>
+	<script src="static/lectures.js"></script>
+        <script src="static/moments.js"></script>
+        <script src="static/pickaday.js"></script>
+        <script>
+            var datePicker = new Pikaday({field: gui.lm('date'), format: 'YYYY-MM-DD'});
+        </script>
+    </body>
+</html>

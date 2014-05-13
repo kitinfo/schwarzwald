@@ -1,21 +1,6 @@
 document.getElementById("status").textContent = "200";
-if (!window.fsdeluxe) {
-    var fsdeluxe = {};
-}
+var fsdeluxe = fsdeluxe || {};
 
-var gui = {
-    lm: function(elem) {
-        return document.getElementById(elem);
-    },
-    cr: function(elem) {
-        return document.createElement(elem);
-    },
-    option: function(elem) {
-        var option = gui.cr('option');
-        option.textContent = elem;
-        return option;
-    }
-};
 fsdeluxe.exams = {
     /**
      * api url
@@ -427,42 +412,33 @@ fsdeluxe.exams = {
         fsdeluxe.exams.getProfs();
         var elem = gui.lm("typeSelector");
         gui.lm("headerTitle").textContent = elem.options[elem.selectedIndex].text;
-    }
-};
-fsdeluxe.gui = {
-    andorid: 1,
-    addSearchField: function() {
-        var span = gui.cr('span');
-        span.setAttribute('id', 'searchInput' + this.andorid);
-        span.setAttribute('class', "searchInput");
-        //gui.lm('searchInputs').appendChild(gui.cr('br'));
-
-        var selector = gui.cr('select');
-        selector.setAttribute('id', 'andor' + fsdeluxe.gui.andorid);
-        selector.setAttribute('class', 'andor');
-        var option = gui.option('OR')
-        option.setAttribute('value', ";OR;");
-        selector.appendChild(option);
-        option = gui.option('AND');
-        option.setAttribute('value', ";AND;");
-        selector.appendChild(option);
-        span.appendChild(selector);
-        var elem = gui.cr('input');
-        elem.setAttribute('list', 'lecturesList');
-        elem.onchange = fsdeluxe.exams.getProfs();
-        elem.setAttribute('placeholder', 'Vorlesung');
-        span.appendChild(elem);
-        var rm = gui.cr('span');
-        rm.setAttribute('class', 'button');
-        rm.textContent = "[-]";
-        rm.setAttribute('onclick', "fsdeluxe.gui.rmSearchField(" + (fsdeluxe.gui.andorid) + ")");
-        span.appendChild(rm);
-        gui.lm('searchInputs').appendChild(span);
-        fsdeluxe.gui.andorid++;
     },
-    rmSearchField: function(id) {
-        console.log(id);
-        gui.lm('searchInputs').removeChild(gui.lm('searchInput' + id));
+    saveCart: function() {
+
+        var output = [];
+
+        fsdeluxe.exams.cartElements.forEach(function(val) {
+            output.push(
+                    {
+                        id: val.id,
+                        type: val.type.id
+                    }
+            );
+        });
+
+        console.log(JSON.stringify(output));
+        var xhr = ajax.syncPost(fsdeluxe.exams.apiUrl + "?save", JSON.stringify(output));
+        console.log(xhr);
+        
+        var erg = JSON.parse(xhr.response);
+        
+        if (erg.cartid) {
+            var cartElem = gui.lm("cartid");
+            cartElem.textContent = erg.cartid;
+            
+            var cartNumber = gui.lm("cartNumber");
+            cartNumber.classList.remove("hidden");
+        }
     }
 };
 // begin with Lectures

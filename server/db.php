@@ -10,10 +10,11 @@ require 'config.php';
 main();
 
 abstract class TYPE {
+
     const PROTOCOL = 0;
     const EXAM = 1;
-}
 
+}
 
 function main() {
     global $db, $output;
@@ -21,60 +22,82 @@ function main() {
     // init
     $output = Output::getInstance();
     $db = new DB();
+    $cart = new Cart();
 
     // db connection
     if (!$db->connect()) {
-	header("WWW-Authenticate: Basic realm=\"Garfield API Access (Invalid Credentials for " . $_SERVER['PHP_AUTH_USER'] . ")\"");
-	header("HTTP/1.0 401 Unauthorized");
+        header("WWW-Authenticate: Basic realm=\"Garfield API Access (Invalid Credentials for " . $_SERVER['PHP_AUTH_USER'] . ")\"");
+        header("HTTP/1.0 401 Unauthorized");
 
-	die();
+        die();
+    }
+
+    if (isset($_GET["save"])) {
+        $output->addStatus("debug", "save");
+        $http_raw = file_get_contents("php://input");
+
+        if (isset($http_raw) && !empty($http_raw)) {
+            $input = json_decode($http_raw, true);
+            $cart->save($input);
+        }
     }
 
     //klausuren
     if (isset($_GET["k"])) {
-	$elem = new Klausuren();
-	$output->add("type", TYPE::EXAM);
+        $elem = new Klausuren();
+        $output->add("type", TYPE::EXAM);
     }
     // protokolle
     else if (isset($_GET["p"])) {
-	$output->add("type", TYPE::PROTOCOL);
-	$elem = new Protokolle();
+        $output->add("type", TYPE::PROTOCOL);
+        $elem = new Protokolle();
     } else {
-	$output->write();
-	die();
+        $output->write();
+        die();
     }
 
     if (isset($_GET["search"])) {
-	$elem->search($_GET["search"]);
+        $elem->search($_GET["search"]);
     } else if (isset($_GET["vorlesungen"])) {
-	$elem->getVorlesungen();
+        $elem->getVorlesungen();
     } else if (isset($_GET["profs"])) {
-	$elem->getProfs();
+        $elem->getProfs();
     } else {
-	$elem->getAll();
+        $elem->getAll();
     }
 
     $output->write();
 }
 
+class Cart {
+
+    function save($input) {
+        //TODO save cart in db
+        global $output;
+        $output->add("inputraw", $input);
+        $output->add("cartid", 1);
+    }
+
+}
+
 class Klausuren {
 
     function search($klausuren) {
-	global $db, $output, $orderBy;
+        global $db, $output, $orderBy;
 
-	if (empty($klausuren)) {
-	    return $this->getAll();
-	} else {
-	    $sql = "SELECT id, vorlesung, datum, prof, kommentar, seiten "
-		    . "FROM public.klausuren "
+        if (empty($klausuren)) {
+            return $this->getAll();
+        } else {
+            $sql = "SELECT id, vorlesung, datum, prof, kommentar, seiten "
+                    . "FROM public.klausuren "
                     . "WHERE veraltet = false";
 
-	    $param = array();
+            $param = array();
 
-	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-		$sql .= " AND prof ILIKE :prof";
-		$param[":prof"] = $_GET["prof"];
-	    }
+            if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+                $sql .= " AND prof ILIKE :prof";
+                $param[":prof"] = $_GET["prof"];
+            }
             if (isset($_GET["newest"]) && !empty($_GET["newest"])) {
                 $sql .= " AND datum <= :newest";
                 $param[":newest"] = $_GET["newest"];
@@ -84,303 +107,301 @@ class Klausuren {
                 $sql .= " AND datum >= :oldest";
                 $param[":oldest"] = $_GET["oldest"];
             }
-            
+
             $searchNew = explode(";AND;", $klausuren);
-            
+
             $oCounter = 0;
-	    
-	    for ($i = 0; $i < count($searchNew); $i++) {
-		
-		$sql .= " AND";
-		
-		$sql .= " (";
-		
-		$in = explode(";OR;",$searchNew[$i]);
-		
-		for ($j = 0; $j < count($in); $j++) {
-		    
-		    if ($j != 0) {
-			$sql .= " OR";
-		    }
-		    
-		    $sql .= " vorlesung ILIKE :v" . $oCounter;
-		    $param[":v" . $oCounter] = $in[$j];
-		    $oCounter++;
-		}
-		
-		$sql .= ")";
-	    }
-            
-	    $db->setOrder("datum", "DESC");
 
-	    $stm = $db->query($sql, $param);
-	}
-	$output->addStatus("search", $stm->errorInfo());
-	if ($stm !== false) {
+            for ($i = 0; $i < count($searchNew); $i++) {
 
-	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
-	    $stm->closeCursor();
-	}
+                $sql .= " AND";
+
+                $sql .= " (";
+
+                $in = explode(";OR;", $searchNew[$i]);
+
+                for ($j = 0; $j < count($in); $j++) {
+
+                    if ($j != 0) {
+                        $sql .= " OR";
+                    }
+
+                    $sql .= " vorlesung ILIKE :v" . $oCounter;
+                    $param[":v" . $oCounter] = $in[$j];
+                    $oCounter++;
+                }
+
+                $sql .= ")";
+            }
+
+            $db->setOrder("datum", "DESC");
+
+            $stm = $db->query($sql, $param);
+        }
+        $output->addStatus("search", $stm->errorInfo());
+        if ($stm !== false) {
+
+            $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+            $stm->closeCursor();
+        }
     }
 
     public function getAll() {
-	global $db, $output;
+        global $db, $output;
 
-	$sql = "SELECT id, vorlesung, datum, prof, kommentar, seiten FROM "
-		. "public.klausuren WHERE veraltet = false";
-	$param = array();
-	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-	    $sql .= " AND prof ILIKE :prof";
-	    $param[":prof"] = $_GET["prof"];
-	}
-       if (isset($_GET["newest"]) && !empty($_GET["newest"])) {
-                $sql .= " AND datum <= :newest";
-                $param[":newest"] = $_GET["newest"];
-                $whereFlag = true;
-            }
-            if (isset($_GET["oldest"]) && !empty($_GET["oldest"])) {
-                $sql .= " AND datum >= :oldest";
-                $param[":oldest"] = $_GET["oldest"];
-            }
-        
-        
-        
+        $sql = "SELECT id, vorlesung, datum, prof, kommentar, seiten FROM "
+                . "public.klausuren WHERE veraltet = false";
+        $param = array();
+        if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+            $sql .= " AND prof ILIKE :prof";
+            $param[":prof"] = $_GET["prof"];
+        }
+        if (isset($_GET["newest"]) && !empty($_GET["newest"])) {
+            $sql .= " AND datum <= :newest";
+            $param[":newest"] = $_GET["newest"];
+            $whereFlag = true;
+        }
+        if (isset($_GET["oldest"]) && !empty($_GET["oldest"])) {
+            $sql .= " AND datum >= :oldest";
+            $param[":oldest"] = $_GET["oldest"];
+        }
 
-	$db->setOrder("datum", "DESC");
-	$stm = $db->query($sql, $param);
 
-	$output->addStatus("search", $stm->errorInfo());
-	if ($stm !== false) {
-	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
-	    $stm->closeCursor();
-	}
+        $db->setOrder("datum", "DESC");
+        $stm = $db->query($sql, $param);
+
+        $output->addStatus("search", $stm->errorInfo());
+        if ($stm !== false) {
+            $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+            $stm->closeCursor();
+        }
     }
 
     public function getVorlesungen() {
-	$this->getGroups("vorlesung");
+        $this->getGroups("vorlesung");
     }
 
     public function getProfs() {
-	$this->getGroups("prof");
+        $this->getGroups("prof");
     }
 
     public function getGroups($col) {
-	global $db, $output;
+        global $db, $output;
 
-	$query = "SELECT " . $col . " FROM public.klausuren";
-	$param = array();
-	if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
-	    $query .= " WHERE vorlesung ILIKE :vorlesung";
-	    $param[":vorlesung"] = $_GET["vorlesung"];
-	}
-	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-	    $query .= " WHERE prof ILIKE :prof";
-	    $param[":prof"] = $_GET["prof"];
-	}
-	
-	$query .= " GROUP BY " . $col;
-	
-	$stmt = $db->query($query, $param);
+        $query = "SELECT " . $col . " FROM public.klausuren";
+        $param = array();
+        if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
+            $query .= " WHERE vorlesung ILIKE :vorlesung";
+            $param[":vorlesung"] = $_GET["vorlesung"];
+        }
+        if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+            $query .= " WHERE prof ILIKE :prof";
+            $param[":prof"] = $_GET["prof"];
+        }
 
-	$output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
+        $query .= " GROUP BY " . $col;
+
+        $stmt = $db->query($query, $param);
+
+        $output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 
 }
 
 class Protokolle {
-    
+
     public function getAll() {
 
-	global $db, $output;
-	
-	$query = "SELECT protokolle.id AS id, datum, seiten, "
-		. "'- ' || string_agg(DISTINCT dozent, '\n- ') AS prof, "
-		. "'- ' || string_agg(DISTINCT vorlesung, '\n- ') AS vorlesung FROM protokolle"
-	. " JOIN pruefungvorlesung"
-	.	" ON (protokollid = protokolle.id)"
-	. " JOIN vorlesungen"
-	.	" ON (vorlesungen.id = vorlesungsid)";
-	
-	$db->setOrder("datum", "DESC");
+        global $db, $output;
 
-	$param = array();
+        $query = "SELECT protokolle.id AS id, datum, seiten, "
+                . "'- ' || string_agg(DISTINCT dozent, '\n- ') AS prof, "
+                . "'- ' || string_agg(DISTINCT vorlesung, '\n- ') AS vorlesung FROM protokolle"
+                . " JOIN pruefungvorlesung"
+                . " ON (protokollid = protokolle.id)"
+                . " JOIN vorlesungen"
+                . " ON (vorlesungen.id = vorlesungsid)";
+
+        $db->setOrder("datum", "DESC");
+
+        $param = array();
         if (isset($_GET["newest"]) && !empty($_GET["newest"])) {
-            
-                $query .= " WHERE datum <= :newest";
-                $param[":newest"] = $_GET["newest"];
-                $whereFlag = true;
-            }
-            if (isset($_GET["oldest"]) && !empty($_GET["oldest"])) {
-                
-                if (!$whereFlag) {
-                    $query .= " WHERE";
-                } else {
-                    $query .= " AND";
-                }
-                
-                $query .= " datum >= :oldest";
-                
-                $param[":oldest"] = $_GET["oldest"];
-            }
-	
-	$query .= " GROUP BY protokolle.id";
-        
-        if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-	    $query .= " HAVING :prof ILIKE ANY(array_agg(dozent))";
-	    $param[":prof"] = $_GET["prof"];
+
+            $query .= " WHERE datum <= :newest";
+            $param[":newest"] = $_GET["newest"];
             $whereFlag = true;
-	}
+        }
+        if (isset($_GET["oldest"]) && !empty($_GET["oldest"])) {
 
-	$stm = $db->query($query, $param);
+            if (!$whereFlag) {
+                $query .= " WHERE";
+            } else {
+                $query .= " AND";
+            }
 
-	$output->addStatus("search", $stm->errorInfo());
-	if ($stm !== null) {
+            $query .= " datum >= :oldest";
 
-	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+            $param[":oldest"] = $_GET["oldest"];
+        }
 
-	    $stm->closeCursor();
-	}
+        $query .= " GROUP BY protokolle.id";
+
+        if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+            $query .= " HAVING :prof ILIKE ANY(array_agg(dozent))";
+            $param[":prof"] = $_GET["prof"];
+            $whereFlag = true;
+        }
+
+        $stm = $db->query($query, $param);
+
+        $output->addStatus("search", $stm->errorInfo());
+        if ($stm !== null) {
+
+            $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+
+            $stm->closeCursor();
+        }
     }
 
     public function search($search) {
 
-	global $db, $output, $orderBy;
+        global $db, $output, $orderBy;
 
-        
-	if (empty($search)) {
-	    return $this->getAll();
-	} else {
-            
+
+        if (empty($search)) {
+            return $this->getAll();
+        } else {
+
             $output->addStatus("searchInput", $search);
-            
-	    $query = "SELECT protokolle.id AS id, datum, seiten, "
-		. "'- ' || string_agg(DISTINCT dozent, '\n- ') AS prof, "
-		. "'- ' || string_agg(DISTINCT vorlesung, '\n- ') AS vorlesung FROM protokolle"
-	. " JOIN pruefungvorlesung"
-	.	" ON (protokollid = protokolle.id)"
-	. " JOIN vorlesungen" 
-	.	" ON (vorlesungen.id = vorlesungsid)";
-	    
-	    $param = array();
-            
-            
+
+            $query = "SELECT protokolle.id AS id, datum, seiten, "
+                    . "'- ' || string_agg(DISTINCT dozent, '\n- ') AS prof, "
+                    . "'- ' || string_agg(DISTINCT vorlesung, '\n- ') AS vorlesung FROM protokolle"
+                    . " JOIN pruefungvorlesung"
+                    . " ON (protokollid = protokolle.id)"
+                    . " JOIN vorlesungen"
+                    . " ON (vorlesungen.id = vorlesungsid)";
+
+            $param = array();
+
+
             if (isset($_GET["newest"]) && !empty($_GET["newest"])) {
                 $query .= " WHERE datum <= :newest";
                 $param[":newest"] = $_GET["newest"];
                 $whereFlag = true;
             }
             if (isset($_GET["oldest"]) && !empty($_GET["oldest"])) {
-                
+
                 if (!$whereFlag) {
                     $query .= " WHERE";
                 } else {
                     $query .= " AND";
                 }
                 $query .= " datum >= :oldest";
-                
+
                 $param[":oldest"] = $_GET["oldest"];
             }
-            
 
-	    $query .= " GROUP BY protokolle.id";
-	    
-	    $searchNew = explode(";AND;",$search);
-	    
-	    $query .= " HAVING";
-	    
-	    $oCounter = 0;
-	    
-	    for ($i = 0; $i < count($searchNew); $i++) {
-		
-		if ($i != 0) {
-		    $query .= " AND";
-		}
-		
-		$query .= " (";
-		
-		$in = explode(";OR;",$searchNew[$i]);
-		
-		for ($j = 0; $j < count($in); $j++) {
-		    
-		    if ($j != 0) {
-			$query .= " OR";
-		    }
-		    
-		    $query .= " :v" . $oCounter . " ILIKE ANY(array_agg(vorlesungen.vorlesung))";
-		    $param[":v" . $oCounter] = $in[$j];
-		    $oCounter++;
-		}
-		
-		$query .= ")";
-	    }
-	    $output->addStatus("debug", $query);
-	    
-	    if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-		$query .= " AND string_agg(dozent, ',') ILIKE :prof";
-		$param[":prof"] = $_GET["prof"];
-	    }
-	    
-	    $db->setOrder("datum", "DESC");
-	    $stm = $db->query($query, $param);
-	}
-	$output->addStatus("search", $stm->errorInfo());
-	if ($stm !== false) {
 
-	    $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
-	    $stm->closeCursor();
-	}
+            $query .= " GROUP BY protokolle.id";
+
+            $searchNew = explode(";AND;", $search);
+
+            $query .= " HAVING";
+
+            $oCounter = 0;
+
+            for ($i = 0; $i < count($searchNew); $i++) {
+
+                if ($i != 0) {
+                    $query .= " AND";
+                }
+
+                $query .= " (";
+
+                $in = explode(";OR;", $searchNew[$i]);
+
+                for ($j = 0; $j < count($in); $j++) {
+
+                    if ($j != 0) {
+                        $query .= " OR";
+                    }
+
+                    $query .= " :v" . $oCounter . " ILIKE ANY(array_agg(vorlesungen.vorlesung))";
+                    $param[":v" . $oCounter] = $in[$j];
+                    $oCounter++;
+                }
+
+                $query .= ")";
+            }
+            $output->addStatus("debug", $query);
+
+            if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+                $query .= " AND string_agg(dozent, ',') ILIKE :prof";
+                $param[":prof"] = $_GET["prof"];
+            }
+
+            $db->setOrder("datum", "DESC");
+            $stm = $db->query($query, $param);
+        }
+        $output->addStatus("search", $stm->errorInfo());
+        if ($stm !== false) {
+
+            $output->add("search", $stm->fetchAll(PDO::FETCH_ASSOC));
+            $stm->closeCursor();
+        }
     }
 
     public function getVorlesungen() {
-	$this->getGroups("vorlesung", "vorlesung");
+        $this->getGroups("vorlesung", "vorlesung");
     }
 
     public function getProfs() {
-	$this->getGroups("dozent", "prof");
+        $this->getGroups("dozent", "prof");
     }
 
     public function getGroups($col, $table) {
-	global $db, $output;
+        global $db, $output;
 
-	if (isset($table) && !empty($table)) {
-	    $erg = $col . " AS " . $table;
-	} else {
-	    $erg = $col;
-	}
-	/*
-	$query = "SELECT " . $erg . " FROM protokolle JOIN gebiet ON "
-		. "(protokolle.gebiet = gebiet.id) JOIN pruefungpruefer ON "
-		. "(protokolle.id = protokollid) JOIN pruefer ON "
-		. "(pruefungpruefer.prueferid = pruefer.id)";
-		*/
-	
-	$query = "SELECT " . $erg . " FROM public.pruefungvorlesung "
-		. "JOIN vorlesungen ON (vorlesungsid = vorlesungen.id)";
-	
-	$param = array();
-	if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
-	    $query .= " WHERE vorlesung ILIKE :vorlesung";
-	    $param[":vorlesung"] = $_GET["vorlesung"];
-	}
-	if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
-	    $query .= " WHERE dozent ILIKE :prof";
-	    $param[":prof"] = $_GET["prof"];
-	}
-	
-	$query .= " GROUP BY " . $col;
-        
-        $db->setOrder($col,"ASC");
+        if (isset($table) && !empty($table)) {
+            $erg = $col . " AS " . $table;
+        } else {
+            $erg = $col;
+        }
+        /*
+          $query = "SELECT " . $erg . " FROM protokolle JOIN gebiet ON "
+          . "(protokolle.gebiet = gebiet.id) JOIN pruefungpruefer ON "
+          . "(protokolle.id = protokollid) JOIN pruefer ON "
+          . "(pruefungpruefer.prueferid = pruefer.id)";
+         */
 
-	$stmt = $db->query($query, $param);
+        $query = "SELECT " . $erg . " FROM public.pruefungvorlesung "
+                . "JOIN vorlesungen ON (vorlesungsid = vorlesungen.id)";
 
-	if (isset($table) && !empty($table)) {
-	    $output->add($table, $stmt->fetchAll(PDO::FETCH_ASSOC));
-	    $output->addStatus($table, $stmt->errorInfo());
-	    return;
-	}
-	$output->addStatus($col, $stmt->errorInfo());
-	$output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
-	$stmt->closeCursor();
+        $param = array();
+        if (isset($_GET["vorlesung"]) && !empty($_GET["vorlesung"])) {
+            $query .= " WHERE vorlesung ILIKE :vorlesung";
+            $param[":vorlesung"] = $_GET["vorlesung"];
+        }
+        if (isset($_GET["prof"]) && !empty($_GET["prof"])) {
+            $query .= " WHERE dozent ILIKE :prof";
+            $param[":prof"] = $_GET["prof"];
+        }
+
+        $query .= " GROUP BY " . $col;
+
+        $db->setOrder($col, "ASC");
+
+        $stmt = $db->query($query, $param);
+
+        if (isset($table) && !empty($table)) {
+            $output->add($table, $stmt->fetchAll(PDO::FETCH_ASSOC));
+            $output->addStatus($table, $stmt->errorInfo());
+            return;
+        }
+        $output->addStatus($col, $stmt->errorInfo());
+        $output->add($col, $stmt->fetchAll(PDO::FETCH_ASSOC));
+        $stmt->closeCursor();
     }
 
 }
@@ -391,53 +412,53 @@ class DB {
     private $order = "";
 
     function connect() {
-	global $dbname, $user, $pass, $port, $host;
+        global $dbname, $user, $pass, $port, $host;
 
-	try {
-	    $this->db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';user=' . $user . ';password=' . $pass . ';sslmode=require');
-	    $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
-	} catch (PDOException $e) {
+        try {
+            $this->db = new PDO('pgsql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname . ';user=' . $user . ';password=' . $pass . ';sslmode=require');
+            $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+        } catch (PDOException $e) {
 
 
-	    if (strpos($e->getMessage(), "user") !== false) {
-		return false;
-	    }
-	    header("Status: 500 " . $e->getMessage());
-	    echo $e->getMessage();
-	    die();
-	}
+            if (strpos($e->getMessage(), "user") !== false) {
+                return false;
+            }
+            header("Status: 500 " . $e->getMessage());
+            echo $e->getMessage();
+            die();
+        }
 
-	return true;
+        return true;
     }
 
     function setOrder($tag, $order) {
-	$this->order = " ORDER BY " . $tag . " " . $order;
+        $this->order = " ORDER BY " . $tag . " " . $order;
     }
 
     function query($sql, $params) {
-	global $output, $orderBy;
+        global $output, $orderBy;
 
-	if (strpos($sql, "SELECT") !== false) {
+        if (strpos($sql, "SELECT") !== false) {
 
-	    $sql .= $this->order;
+            $sql .= $this->order;
 
-	    if (isset($_GET["limit"]) && !empty($_GET["limit"])) {
-		$sql .= " LIMIT :limit";
-		$params[":limit"] = $_GET["limit"];
-	    }
-	}
+            if (isset($_GET["limit"]) && !empty($_GET["limit"])) {
+                $sql .= " LIMIT :limit";
+                $params[":limit"] = $_GET["limit"];
+            }
+        }
 
-	$stm = $this->db->prepare($sql);
+        $stm = $this->db->prepare($sql);
 
-	if ($this->db->errorCode() > 0) {
-	    $output->addStatus("db", $this->db->errorInfo());
-	    return null;
-	}
+        if ($this->db->errorCode() > 0) {
+            $output->addStatus("db", $this->db->errorInfo());
+            return null;
+        }
 
-	$stm->execute($params);
+        $stm->execute($params);
 
 
-	return $stm;
+        return $stm;
     }
 
 }
@@ -454,7 +475,7 @@ class Output {
      * constructor
      */
     private function __construct() {
-	$this->retVal['status']["db"] = "ok";
+        $this->retVal['status']["db"] = "ok";
     }
 
     /**
@@ -462,11 +483,11 @@ class Output {
      * @return Output output instance
      */
     public static function getInstance() {
-	if (!self::$instance) {
-	    self::$instance = new self();
-	}
+        if (!self::$instance) {
+            self::$instance = new self();
+        }
 
-	return self::$instance;
+        return self::$instance;
     }
 
     /**
@@ -475,7 +496,7 @@ class Output {
      * @param type $output
      */
     public function add($table, $output) {
-	$this->retVal[$table] = $output;
+        $this->retVal[$table] = $output;
     }
 
     /**
@@ -485,16 +506,16 @@ class Output {
      */
     public function addStatus($table, $output) {
 
-	if (is_array($output) && $output[1]) {
+        if (is_array($output) && $output[1]) {
             if (is_array($retVal["status"]["debug"])) {
                 $this->retVal["status"]["debug"][] = $output;
             } else {
                 $retVal["status"]["debug"] = array($output);
             }
-	    $this->retVal["status"]["db"] = "failed";
-	}
+            $this->retVal["status"]["db"] = "failed";
+        }
 
-	$this->retVal['status'][$table] = $output;
+        $this->retVal['status'][$table] = $output;
     }
 
     /**
@@ -502,15 +523,15 @@ class Output {
      */
     public function write() {
 
-	header("Content-Type: application/json");
-	header("Access-Control-Allow-Origin: *");
-	# Rückmeldung senden
-	if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
-	    $callback = $_GET["callback"];
-	    echo $callback . "('" . json_encode($this->retVal, JSON_NUMERIC_CHECK) . "')";
-	} else {
-	    echo json_encode($this->retVal, JSON_NUMERIC_CHECK);
-	}
+        header("Content-Type: application/json");
+        header("Access-Control-Allow-Origin: *");
+        # Rückmeldung senden
+        if (isset($_GET["callback"]) && !empty($_GET["callback"])) {
+            $callback = $_GET["callback"];
+            echo $callback . "('" . json_encode($this->retVal, JSON_NUMERIC_CHECK) . "')";
+        } else {
+            echo json_encode($this->retVal, JSON_NUMERIC_CHECK);
+        }
     }
 
 }
