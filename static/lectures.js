@@ -437,8 +437,20 @@ fsdeluxe.exams = {
             cartElem.textContent = erg.cartid;
             
             var cartNumber = gui.lm("cartNumber");
-            cartNumber.classList.remove("hidden");
+            fsdeluxe.exams.showAgain();
         }
+    },
+    mail: function() {
+        
+    },
+    close: function() {
+        gui.lm("cartNumber").classList.add("hidden");
+        gui.lm("againButton").classList.remove("hidden");
+        gui.lm("black").classList.add("hidden");
+    },
+    showAgain: function() {
+        gui.lm("cartNumber").classList.remove("hidden");
+        gui.lm("black").classList.remove("hidden");
     }
 };
 // begin with Lectures

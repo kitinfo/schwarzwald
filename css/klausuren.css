@@ -7,6 +7,7 @@ and open the template in the editor.
     Created on : 31.01.2014, 11:35:07
     Author     : mpease
 */
+
 body {
     width: 80%;
     margin: 0 auto;
@@ -14,6 +15,7 @@ body {
     background-color: #aaa;
     padding: 2%;
     border-radius: 10px;
+    min-height: 90%;
 }
 
 header {
@@ -76,6 +78,9 @@ input[type=number]  {
 
 html {
     background-color: #ddd;
+    height: 100%;
+    width: 100%;
+    padding: 0;
 }
 
 #status {
@@ -207,7 +212,7 @@ input[type="text"], input[type="number"] {
 
 #cartNumber {
     width: 50%;
-    height: 50%;
+    //height: 50%;
     position: fixed;
     left: 25%;
     top: 25%;
@@ -215,6 +220,7 @@ input[type="text"], input[type="number"] {
     background-color: #999;
     box-shadow: 0.3em 0.3em #888;
     text-align: center;
+    z-index: 1000;
 }
 
 #cartid {
@@ -225,4 +231,43 @@ input[type="text"], input[type="number"] {
 #cartNumberDiv {
     padding: 10%;
     font-size: 2em;
+    background-color: #ccc;
+    //box-shadow: 0.2em 0.2em #bbb;
+    border-radius: 1em;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+#agb {
+    border: 1px solid black;
+    text-align: justify;
+    margin-top: 2%;
+    margin-left: 10%;
+    margin-right: 10%;
+    padding: 1%;
+}
+
+.center {
+    text-align: center;
+    width: 100%;
+    display:inline-block;
+}
+
+.title {
+    font-size: 4em;
+}
+
+#closeButton {
+    font-size: 1.4em;
+}
+
+#black {
+    position: fixed;
+    background-color: #333;
+    opacity: 0.5;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 100;
 }

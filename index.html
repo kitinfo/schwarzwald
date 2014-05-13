@@ -14,6 +14,7 @@ and open the template in the editor.
         <link rel="stylesheet" type="text/css" href="css/pikaday.css" />
     </head>
     <body>
+        <div id="black" class="hidden"></div>
         <div id="status"></div>
         <header>
             <img src="static/schwarzwald.svg" id="logo" alt="logo" />
@@ -111,10 +112,11 @@ and open the template in the editor.
 
                 <div id="saveOptions">
                     <button id="saveButton" onclick="fsdeluxe.exams.saveCart()">Save</button>
+                    <button id="againButton" class="hidden" onclick="fsdeluxe.exams.showAgain()">ID schon vergessen?</button>
                 </div>
             </div>
         </div>
-        
+
         <div id="cartNumber" class="hidden">
             <div class="title">Das Speichern war erfolgreich</div>
             <div id="cartNumberDiv">    
@@ -124,8 +126,18 @@ and open the template in the editor.
             <div id="agb">
                 <b>Weiteres Vorgehen:</b><br />
                 Mit dieser ID kannst du in der Fachschaft deine Klausuren/Protokolle
-                abholen.
+                abholen.<br />
+                WICHTIG: Ohne diese ID können wir deine Bestellung nicht zuordnen,
+                also nicht vergessen. <br />
+                Falls du willst, kannst du hier deine Mail-Adresse hinterlegen,
+                dann schicken wir die ID per Mail zu
+                (die Mail wird nicht im System gespeichert).<br />
+                <span class="center">
+                    <input type="email" id="mail" placeholder="mail" />
+                    <button onclick="fsdeluxe.exams.mail()">Mail</button>
+                </span>
             </div>
+            <button id="closeButton" onclick="fsdeluxe.exams.close()">Schließen</button>
         </div>
 
         <footer></footer>
@@ -136,8 +148,8 @@ and open the template in the editor.
         <script src="static/moments.js"></script>
         <script src="static/pickaday.js"></script>
         <script>
-                        var pickerNewest = new Pikaday({field: gui.lm('newest'), format: 'YYYY-MM-DD'});
-                        var pickerOldest = new Pikaday({field: gui.lm('oldest'), format: 'YYYY-MM-DD'});
+                var pickerNewest = new Pikaday({field: gui.lm('newest'), format: 'YYYY-MM-DD'});
+                var pickerOldest = new Pikaday({field: gui.lm('oldest'), format: 'YYYY-MM-DD'});
         </script>
     </body>
 </html>
