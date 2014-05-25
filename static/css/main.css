@@ -3,10 +3,6 @@
     Author     : mpease
 */
 
-.clear{
-	clear:both;
-}
-
 table{
 	width:100%;
 }
@@ -74,15 +70,8 @@ table {
     border-radius: 10px;
 }
 
-h2 {
-    text-align: center;
-}
 #cartOptions {
     float: right;
-}
-
-form {
-    display: block;
 }
 
 table tbody {
@@ -113,9 +102,6 @@ tbody tr:nth-child(even) {
     max-width: 5em;
 }
 
-#typeSelector {
-    float: right;
-}
 
 #searchInputs {
     display: inline-block;
