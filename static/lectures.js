@@ -1,4 +1,3 @@
-document.getElementById("status").textContent = "200";
 var fsdeluxe = fsdeluxe || {};
 
 fsdeluxe.exams = {

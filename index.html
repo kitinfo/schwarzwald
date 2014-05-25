@@ -176,11 +176,19 @@
 			<div id="status"></div>
 		</footer>
 
+		<!-- Libraries //-->
 		<script src="static/ajax.js"></script>
+		<script src="static/pickaday.js"></script>
+		<script src="static/debug.js"></script>
+
+		<!-- Actual code //-->
+		<script src="static/config.js"></script>
+		<script src="static/api.js"></script>
+
 		<script src="static/common.js"></script>
 		<script src="static/lectures.js"></script>
-		<script src="static/moments.js"></script>
-		<script src="static/pickaday.js"></script>
+
+		<!-- Initialization //-->
 		<script>
 			var pickerNewest = new Pikaday({field: gui.lm('newest'), format: 'YYYY-MM-DD'});
 			var pickerOldest = new Pikaday({field: gui.lm('oldest'), format: 'YYYY-MM-DD'});
