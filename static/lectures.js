@@ -259,7 +259,7 @@ fsdeluxe.exams = {
         }
         console.log(searchString);
         var limit = gui.lm(self.limitTag).value;
-        var type = gui.lm("typeSelector").value;
+        var type = gui.lm("select-mode").value;
         var prof = gui.lm("profInput").value;
         var url = this.apiUrl + "?" + type
                 + "&search=" + searchString
