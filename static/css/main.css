@@ -9,7 +9,6 @@
 
 table{
 	width:100%;
-    border-collapse: collapse;
 }
 
 label {
@@ -126,9 +125,6 @@ tbody tr:nth-child(even) {
     display: block;
 }
 
-.button:hover, button:hover, input[type="submit"]:hover, input[type="button"]:hover {
-    background-color: #ccc;
-}
 #searchInputs select {
     width: 4em;
 }
@@ -142,20 +138,7 @@ select {
     background-color: transparent;
 }
 
-input[type="submit"], input[type="button"], button, .button {
-    display: inline-block;
-    text-align: center;
-    background-color: #bbb;
-    border-radius: 0.2em;
-    cursor: pointer;
-    box-shadow: 0.1em 0.1em #888;
-    border: none;
-    padding: 0.1em 0.2em;
-}
 
-.button {
-    font-size: 1.2em;
-}
 input[type="text"], input[type="number"] {
     border-color: #EEE;
     padding: 0 0.2em;

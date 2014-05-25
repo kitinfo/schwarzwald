@@ -4,8 +4,9 @@
 		<title>Schwarzwald - Das Sales-System der FSMI</title>
 		<meta charset="UTF-8">
 
-		<link rel="stylesheet" type="text/css" href="static/css/layout.css" />
 		<link rel="stylesheet" type="text/css" href="static/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="static/css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="static/css/classes.css" />
 		<link rel="stylesheet" type="text/css" href="static/css/pikaday.css" />
 
 		<!-- FIXME: meta-info //-->
@@ -67,7 +68,7 @@
 				</div>
 
 				<div class="clear"></div>
-				<input type="submit" value="Suche" id="searchButton" />
+				<span class="button" onclick="fsdeluxe.exams.search();">Suchen</span>
 				<div id="limit">
 					<label for="limitInput">
 						<span class="text">Limit:</span>
@@ -104,15 +105,15 @@
 						</tfoot>
 					</table>
 				</div>
-				<button id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</button>
+				<span class="button" id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</span>
 			</div>
 
 			<div id="cart">
 				<div id="cartControls">
-					<button id="cartRemoveButton" onclick="fsdeluxe.exams.remCart()" >Remove</button>
+					<span class="button" id="cartRemoveButton" onclick="fsdeluxe.exams.remCart()" >Remove</span>
 					<input type="text" id="cartRemoveInput" />
 				</div>
-				<div id="cartOutput" class="ouput">
+				<div id="cartOutput">
 					<table>
 						<thead>
 							<tr>
@@ -143,7 +144,7 @@
 				</div>
 
 				<div id="saveOptions">
-					<button id="saveButton" onclick="fsdeluxe.exams.saveCart()">Save</button>
+					<span class="button" id="saveButton" onclick="fsdeluxe.exams.saveCart()">Save</span>
 					<button id="againButton" class="hidden" onclick="fsdeluxe.exams.showAgain()">Nummer schon vergessen?</button>
 				</div>
 			</div>
@@ -161,7 +162,7 @@
 				Bitte notiere dir die oben angezeigte Referenznummer.
 				Sie identifiziert deine Auswahl an Protokollen/Klausuren eindeutig.
 				Nenne sie einem Fachschaftler und er wird dir deine Auswahl drucken.<br />
-				Um eine einmalige Erinnerungsmail mit deiner Nummer zu erhalten, gib deine ID hier ein (wird nur zum Versand der Email verwendet).
+				Um eine einmalige Erinnerungsmail mit deiner Nummer zu erhalten, kannst du deine Emailadresse unten eingeben (wird nur zum Versand der Email verwendet).
 				<br />
 				<span class="center">
 					<input type="email" id="mail" placeholder="mail" />
