@@ -1,0 +1,68 @@
+/* MAIN COLOR SCHEME */
+html {
+	background-color:#aab;
+}
+
+body {
+	background-color:#bbc;
+}
+
+/* BODY/CONTENT */
+body{
+	width:80%;
+	margin:auto;
+	margin-top:1em;
+	border-radius:1em;
+	padding:1em;	
+}
+
+#content{
+	margin-top:2em;
+}
+
+#select-mode{
+	border-radius:0.3em;
+	color:#333;
+	background-color:#fff;
+	border:0.1em solid #33a;
+}
+
+/* HEADER */
+header{
+	text-align:center;
+}
+
+#head-static{
+	float:left;
+	display:block;
+}
+
+#head-static * {
+	margin:0;
+	text-align:left;
+	vertical-align:center;
+}
+
+#sw-head-logo{
+	width:5em;
+	float:left;
+}
+
+#sw-head-text{
+	display:inline-block;
+	padding-left:0.5em;
+}
+
+#sw-head-text h3{
+	color:#666;
+}
+
+#sw-head-text h1{
+	color:#333;
+}
+
+#select-mode{
+	float:right;
+	font-size:150%;
+}
+

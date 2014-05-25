@@ -281,7 +281,8 @@ fsdeluxe.exams = {
      */
     getLectures: function() {
         var self = fsdeluxe.exams;
-        var elem = gui.lm("typeSelector");
+	//FIXME make this properly modular
+        var elem = gui.lm("select-mode");
         ajax.asyncGet(this.apiUrl + "?" + elem.value
                 + "&vorlesungen"
                 + "&prof=" + gui.lm("profInput").value
@@ -291,7 +292,7 @@ fsdeluxe.exams = {
     },
     getProfs: function() {
         var self = fsdeluxe.exams;
-        var elem = gui.lm("typeSelector");
+        var elem = gui.lm("select-mode");
         ajax.asyncGet(this.apiUrl + "?" + elem.value
                 + "&profs"
                 + "&vorlesung=" + gui.lm("searchInput0").value
@@ -410,8 +411,9 @@ fsdeluxe.exams = {
     typeChanged: function() {
         fsdeluxe.exams.getLectures();
         fsdeluxe.exams.getProfs();
-        var elem = gui.lm("typeSelector");
-        gui.lm("headerTitle").textContent = elem.options[elem.selectedIndex].text;
+	//FIXME:
+        //var elem = gui.lm("select-mode");
+        //gui.lm("headerTitle").textContent = elem.options[elem.selectedIndex].text;
     },
     saveCart: function() {
 
