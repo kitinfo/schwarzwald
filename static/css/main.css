@@ -3,14 +3,12 @@
     Author     : mpease
 */
 
-
-.clear {
-    clear: both;
+.clear{
+	clear:both;
 }
 
-table {
-    width: 100%;
-    text-align: center;
+table{
+	width:100%;
     border-collapse: collapse;
 }
 
