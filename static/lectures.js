@@ -26,7 +26,6 @@ fsdeluxe.exams = {
     searchOutputTBody: "searchOutputBody",
     searchTag: "searchInput",
     limitTag: "limitInput",
-    statusTag: "status",
     cartRemoveInput: "cartRemoveInput",
     cartTableBody: "cartOutputBody",
     /**
@@ -167,7 +166,7 @@ fsdeluxe.exams = {
             return;
         }
         var data = JSON.parse(xhr.response);
-        gui.lm(self.statusTag).textContent = xhr.status;
+	schwarzwald.gui.statusDisplay("Fetched data.");
         var outputTable = gui.lm(self.searchOutputTBody);
         outputTable.innerHTML = "";
         self.searchElements = [];
@@ -228,7 +227,7 @@ fsdeluxe.exams = {
     fillDatalist: function(datalist, tag, xhr) {
         var self = fsdeluxe.exams;
         var v = JSON.parse(xhr.response);
-        gui.lm(self.statusTag).textContent = xhr.status;
+	schwarzwald.gui.statusDisplay("Fetched data.");
         datalist.innerHTML = "";
         v[tag].forEach(function(val) {
             var item = document.createElement('option');
@@ -340,7 +339,7 @@ fsdeluxe.exams = {
     error: function(xhr) {
         console.log("Error getting request");
         console.log(xhr);
-        gui.lm("status").textContent = xhr.responseText;
+	schwarzwald.gui.statusDisplay("Request failed: HTTP "+xhr.status);
     },
     addToCart: function() {
         var self = fsdeluxe.exams;
