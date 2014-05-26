@@ -2,7 +2,7 @@ var schwarzwald = schwarzwald || {};
 
 schwarzwald.api = {
 	fetch:function(payload, completionFunc, errFunc){
-		ajax.asyncPost(schwarzwald.config.apiEndpoint+"?fetch", JSON.stringify(payload), function(request){
+		ajax.asyncPost(schwarzwald.config.apiEndpoint+"fetch/", JSON.stringify(payload), function(request){
 			if(request.status!=200){
 				errFunc("Data fetch returned HTTP "+request.status);
 			}

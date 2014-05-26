@@ -4,7 +4,7 @@ schwarzwald.config = schwarzwald.config || {
 	/**
 	 * API Endpoint URL
 	 */
-	apiEndpoint:"server/db.php",
+	apiEndpoint:"api/",
 
 	/**
 	 * Price per printed Page
