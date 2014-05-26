@@ -2,7 +2,7 @@ var schwarzwald = schwarzwald || {};
 
 schwarzwald.api = {
 	fetch:function(payload, completionFunc, errFunc){
-		ajax.asyncPost(schwarzwald.config.apiEndpoint+"fetch/", JSON.stringify(payload), function(request){
+		ajax.asyncPost(schwarzwald.config.apiBase+"fetch/", JSON.stringify(payload), function(request){
 			if(request.status!=200){
 				errFunc("Data fetch returned HTTP "+request.status);
 			}
@@ -29,7 +29,7 @@ schwarzwald.api = {
 		schwarzwald.api.fetch({"content":"professors"}, completionFunc, errFunc);
 	},
 
-	fetchResults:function(type, filter, completionFunc, errFunc){
-		schwarzwald.api.fetch({"content":type, "filter":filter}, completionFunc, errFunc);
+	search:function(type, filter, completionFunc, errFunc){
+		//TODO query search/ endpoint
 	}
 };

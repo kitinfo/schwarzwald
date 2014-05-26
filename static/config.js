@@ -2,9 +2,9 @@ var schwarzwald = schwarzwald || {};
 
 schwarzwald.config = schwarzwald.config || {
 	/**
-	 * API Endpoint URL
+	 * API Base URL
 	 */
-	apiEndpoint:"api/",
+	apiBase:"api/",
 
 	/**
 	 * Price per printed Page
