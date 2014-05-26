@@ -4,8 +4,10 @@
 		<title>Schwarzwald - Das Sales-System der FSMI</title>
 		<meta charset="UTF-8">
 
-		<link rel="stylesheet" type="text/css" href="static/css/main.css" />
 		<link rel="stylesheet" type="text/css" href="static/css/layout.css" />
+		<link rel="stylesheet" type="text/css" href="static/css/hacks.css" />
+		<link rel="stylesheet" type="text/css" href="static/css/main.css" />
+		<link rel="stylesheet" type="text/css" href="static/css/search.css" />
 		<link rel="stylesheet" type="text/css" href="static/css/classes.css" />
 		<link rel="stylesheet" type="text/css" href="static/css/pikaday.css" />
 
@@ -24,28 +26,23 @@
 					<h1>Schwarzwald</h1>
 				</div>
 			</div>
-			<!-- FIXME: values, dom name, call //-->
-			<select id="select-mode" onchange="fsdeluxe.exams.typeChanged()">
-				<option value="p">Protokolle</option>
-				<option value="k">Klausuren</option>
-			</select>
 		</header>
 		<div class="clear"></div>
 
 
 		<div id="content">
-			<div id="search">
+			<div class="content-box">
 				<datalist id="lecturesList"></datalist>
 				<datalist id="profList"></datalist>
 
 				<label for="profInput">
-					<span class="text">Prof:</span> 
+					<span class="description">Dozent:</span> 
 					<br />
-					<input type="text" list="profList" id="profInput" onchange="fsdeluxe.exams.getLectures()" placeholder="Prof" value=""/>
+					<input type="text" list="profList" id="profInput" onchange="fsdeluxe.exams.getLectures()" placeholder="Dozent" value=""/>
 				</label>
 
 				<label for="searchInput">
-					<span class="text">Suche:</span>
+					<span class="description">Suche:</span>
 					<br />
 					<span id="searchInputs">
 						<input type="text" list="lecturesList" id="searchInput0" onchange="fsdeluxe.exams.getProfs()" placeholder="Vorlesung"/>
@@ -53,15 +50,26 @@
 					<span class="button" onclick="fsdeluxe.gui.addSearchField()">+</span>
 				</label>
 
-				<div id="timestampBox">
+
+				<div class="search-filter right">
+					<!-- FIXME: values, dom name, call //-->
+					<label for="select-mode">
+						<span class="description">Typ</span>
+						<br/>
+						<select id="select-mode" onchange="fsdeluxe.exams.typeChanged()">
+							<option value="p">Protokolle</option>
+							<option value="k">Klausuren</option>
+						</select>
+					</label>
+					
 					<label for="oldest">
-						<span class="text">Von:</span> 
+						<span class="description">Von:</span> 
 						<br />
 						<input type="text" id="oldest" class="timestamp" placeholder="JJJJ-MM-TT"/>
 					</label>
 				
 					<label for="newest">
-						<span class="text">Bis:</span> 
+						<span class="description">Bis:</span> 
 						<br />
 						<input type="text" id="newest" class="timestamp" placeholder="JJJJ-MM-TT"/>
 					</label>
@@ -71,7 +79,7 @@
 				<span class="button" onclick="fsdeluxe.exams.search();">Suchen</span>
 				<div id="limit">
 					<label for="limitInput">
-						<span class="text">Limit:</span>
+						<span class="description">Maximale Anzahl:</span>
 						<input type="number" id="limitInput" value="0" />
 					</label>
 				</div>
@@ -108,7 +116,7 @@
 				<span class="button" id="cartAddButton" onclick="fsdeluxe.exams.addToCart()" >Add</span>
 			</div>
 
-			<div id="cart">
+			<div class="content-box">
 				<div id="cartControls">
 					<span class="button" id="cartRemoveButton" onclick="fsdeluxe.exams.remCart()" >Remove</span>
 					<input type="text" id="cartRemoveInput" />
@@ -173,6 +181,7 @@
 		</div>
 
 		<footer>
+		Schwarzwald on <a href="http://github.com/kitinfo/schwarzwald">Github</a>
 			<div id="status"></div>
 		</footer>
 

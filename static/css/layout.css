@@ -1,6 +1,7 @@
 /* MAIN COLOR SCHEME */
 html {
-	background-color:#aab;
+	background-color:#eee;
+	background-image:url(../img/dark_matter.png);
 }
 
 body {
@@ -14,6 +15,16 @@ body{
 	margin-top:1em;
 	border-radius:1em;
 	padding:1em;	
+	box-shadow:0 0 0.2em 0.1em #999;
+}
+
+label{
+	display:inline-block;
+}
+
+table{
+	width:100%;
+	border-collapse:collapse;
 }
 
 #content{
@@ -25,6 +36,13 @@ body{
 	color:#333;
 	background-color:#fff;
 	border:0.1em solid #33a;
+}
+
+.content-box{
+	padding:2em;
+	margin:2em;
+	border:1px solid #000;
+	border-radius:1em;
 }
 
 /* HEADER */
@@ -62,7 +80,8 @@ header{
 }
 
 #select-mode{
+	vertical-align:bottom;
+	display:inline-block;
 	float:right;
-	font-size:150%;
 }
 

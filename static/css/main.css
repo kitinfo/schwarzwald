@@ -3,22 +3,6 @@
     Author     : mpease
 */
 
-table{
-	width:100%;
-}
-
-label {
-    float: left;
-    display: inline-block;
-    font-size: 0.8em;
-    margin-right: 0.4em;
-    margin-bottom: 0.2em;
-}
-
-label .text {
-    margin-left: 0.5em;
-}
-
 tfoot {
     border-top: 1px solid black;
 }
@@ -49,11 +33,6 @@ input[type=number]  {
     float: right;
 }
 
-table {
-    width: 100%;
-    text-align: center;
-    border-collapse: collapse;
-}
 
 .colLectures {
     text-align: left;
@@ -63,12 +42,6 @@ table {
     font-weight: bold;
 }
 
-#search, #cart {
-    padding: 2%;
-    margin: 2%;
-    border: 1px solid black;
-    border-radius: 10px;
-}
 
 #cartOptions {
     float: right;
@@ -90,9 +63,6 @@ table tbody tr::before {
     vertical-align: inherit;
 }
 
-//tbody tr:nth-child(odd) {
-//    background-color: #ddd;
-//}
 tbody tr:nth-child(even) {
  background-color: #ddd;
 }
@@ -103,9 +73,6 @@ tbody tr:nth-child(even) {
 }
 
 
-#searchInputs {
-    display: inline-block;
-}
 
 .searchInput {
     display: block;
@@ -113,15 +80,6 @@ tbody tr:nth-child(even) {
 
 #searchInputs select {
     width: 4em;
-}
-
-#timestampBox {
-    float:right;
-}
-
-select {
-    border: solid 0.1em #888;
-    background-color: transparent;
 }
 
 
