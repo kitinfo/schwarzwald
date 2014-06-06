@@ -1,9 +1,9 @@
 <?php
 	$DB_HOST="fsmi-db";
 	$DB_PORT="5432";
-	$DB_NAME="";
-	$DB_USER="";
-	$DB_PASS="";
+	$DB_NAME="proto";
+	$DB_USER="proto";
+	$DB_PASS="proto";
 
 	try{
 		$db=new PDO("pgsql:sslmode=require;host=".$DB_HOST.";port=".$DB_PORT.";dbname=".$DB_NAME.";user=".$DB_USER.";password=".$DB_PASS.";");

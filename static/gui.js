@@ -28,6 +28,16 @@ schwarzwald.gui.dom = {
 	statusDisplay:document.getElementById("status")
 };
 
+schwarzwald.gui.dom.filters = {
+	text:document.getElementById("searchInput0"),
+	textElements:document.getElementsByClassName("searchInput"),
+	limit:document.getElementById("limitInput"),
+	type:document.getElementById("select-mode"),
+	prof:document.getElementById("profInput"),
+	from:document.getElementById("oldest"),
+	until:document.getElementById("newest")
+};
+
 schwarzwald.gui.dom.datalists = {
 	lectures:document.getElementById("lecturesList"),
 	professors:document.getElementById("profList")

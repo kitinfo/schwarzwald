@@ -1,8 +1,8 @@
 var schwarzwald = schwarzwald || {};
 
 schwarzwald.api = {
-	fetch:function(payload, completionFunc, errFunc){
-		ajax.asyncPost(schwarzwald.config.apiBase+"fetch/", JSON.stringify(payload), function(request){
+	post:function(endpoint, payload, completionFunc, errFunc){
+		ajax.asyncPost(schwarzwald.config.apiBase+endpoint+"/", JSON.stringify(payload), function(request){
 			if(request.status!=200){
 				errFunc("Data fetch returned HTTP "+request.status);
 			}
@@ -24,6 +24,10 @@ schwarzwald.api = {
 			errFunc(error.message);
 		}, "application/json");	
 	},
+
+	fetch:function(payload, completionFunc, errFunc){
+		schwarzwald.api.post("fetch", payload, completionFunc, errFunc);
+	},
 	
 	fetchLectures:function(completionFunc, errFunc){
 		schwarzwald.api.fetch({"content":"lectures"}, completionFunc, errFunc);
@@ -33,7 +37,7 @@ schwarzwald.api = {
 		schwarzwald.api.fetch({"content":"professors"}, completionFunc, errFunc);
 	},
 
-	search:function(type, filter, completionFunc, errFunc){
-		//TODO query search/ endpoint
+	search:function(filters, completionFunc, errFunc){
+		schwarzwald.api.post("search", {"filters":filters}, completionFunc, errFunc);
 	}
 };

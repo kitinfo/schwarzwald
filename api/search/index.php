@@ -1,4 +1,4 @@
 <?php
-	//Fetch API Endpoint
+	//Search API Endpoint
 ?>
-{"status":"failed"}
+{"code":500, "message":"Not yet implemented"}
