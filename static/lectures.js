@@ -244,8 +244,6 @@ fsdeluxe.exams = {
      * @returns {void}
      */
     search: function() {
-	var self = fsdeluxe.exams;
-
         var filters=[];
 	//Valid filter ops:
 	//text
@@ -271,7 +269,7 @@ fsdeluxe.exams = {
 	filters.push({"op":"professor","param":schwarzwald.gui.dom.filters.prof.value});
 	
 	//Text search
-	filters.push({"op":"text","param":document.getElementById(self.searchTag+"0").value});
+	filters.push({"op":"text","param":schwarzwald.gui.dom.filters.text.value});
 
 	filterElements=schwarzwald.gui.dom.filters.textElements;
 	for(var i=0;i<filterElements.length;i++){
