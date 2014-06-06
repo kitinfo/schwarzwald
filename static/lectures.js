@@ -159,14 +159,9 @@ fsdeluxe.exams = {
         checkbox.checked = !checkbox.checked;
         fsdeluxe.exams.calcPrice('search');
     },
-    fillExams: function(xhr) {
+    fillExams: function(data) {
 
         var self = fsdeluxe.exams;
-        if (xhr.response === "") {
-            return;
-        }
-        var data = JSON.parse(xhr.response);
-	schwarzwald.gui.statusDisplay("Fetched data.");
         var outputTable = gui.lm(self.searchOutputTBody);
         outputTable.innerHTML = "";
         self.searchElements = [];
@@ -223,21 +218,6 @@ fsdeluxe.exams = {
          }*/
 
         self.calcPrice("search");
-    },
-    fillDatalist: function(datalist, tag, xhr) {
-        var self = fsdeluxe.exams;
-        var v = JSON.parse(xhr.response);
-        datalist.innerHTML = "";
-        v[tag].forEach(function(val) {
-            var item = document.createElement('option');
-            item.setAttribute('value', val[tag]);
-            datalist.appendChild(item);
-        });
-    },
-    encode: function(string) {
-        var encoded = string.replace(/"%"/g, "&#037;");
-        console.log(encoded);
-        return encoded;
     },
     /**
      * starts a search action
@@ -343,7 +323,6 @@ fsdeluxe.exams = {
     error: function(xhr) {
         console.log("Error getting request");
         console.log(xhr);
-	schwarzwald.gui.statusDisplay("Request failed: HTTP "+xhr.status);
     },
     addToCart: function() {
         var self = fsdeluxe.exams;
@@ -413,9 +392,6 @@ fsdeluxe.exams = {
     typeChanged: function() {
         fsdeluxe.exams.getLectures();
         fsdeluxe.exams.getProfs();
-	//FIXME:
-        //var elem = gui.lm("select-mode");
-        //gui.lm("headerTitle").textContent = elem.options[elem.selectedIndex].text;
     },
     saveCart: function() {
 
