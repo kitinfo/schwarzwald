@@ -227,7 +227,6 @@ fsdeluxe.exams = {
     fillDatalist: function(datalist, tag, xhr) {
         var self = fsdeluxe.exams;
         var v = JSON.parse(xhr.response);
-	schwarzwald.gui.statusDisplay("Fetched data.");
         datalist.innerHTML = "";
         v[tag].forEach(function(val) {
             var item = document.createElement('option');
@@ -278,17 +277,21 @@ fsdeluxe.exams = {
      * @returns {void}
      */
     getLectures: function() {
-        var self = fsdeluxe.exams;
-	//FIXME make this properly modular
-        var elem = gui.lm("select-mode");
+	/*REPLACE THIS*/
+        /*var self = fsdeluxe.exams;
+       var elem = gui.lm("select-mode");
         ajax.asyncGet(this.apiUrl + "?" + elem.value
                 + "&vorlesungen"
                 + "&prof=" + gui.lm("profInput").value
                 , function(xhr) {
                     self.fillDatalist(gui.lm("lecturesList"), "vorlesung", xhr);
                 }, self.error);
+*/
+	/*WITH THIS*/
+	schwarzwald.api.fetchLectures(function(data){schwarzwald.gui.setDataList(schwarzwald.gui.dom.datalists.lectures, data.content)}, schwarzwald.log.status);
     },
     getProfs: function() {
+	    /*
         var self = fsdeluxe.exams;
         var elem = gui.lm("select-mode");
         ajax.asyncGet(this.apiUrl + "?" + elem.value
@@ -297,6 +300,8 @@ fsdeluxe.exams = {
                 , function(xhr) {
                     fsdeluxe.exams.fillDatalist(gui.lm("profList"), "prof", xhr);
                 }, self.error);
+*/
+	schwarzwald.api.fetchProfessors(function(data){schwarzwald.gui.setDataList(schwarzwald.gui.dom.datalists.professors, data.content)}, schwarzwald.log.status);
     },
     /**
      * Calculates the price for all checked lectures.

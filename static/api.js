@@ -14,6 +14,10 @@ schwarzwald.api = {
 					errFunc("Failed to parse Response: "+e.message);
 					return;
 				}
+				if(data.code!=200){
+					errFunc(data.message);
+					return;
+				}
 				completionFunc(data);
 			}
 		}, function(error){
