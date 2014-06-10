@@ -13,7 +13,7 @@
 
 		<!-- FIXME: meta-info //-->
 	</head>
-	<body>
+	<body onload="schwarzwald.init();">
 		<!-- FIXME: whats this //-->
 		<div id="black" class="hidden"></div>
 		
@@ -38,14 +38,14 @@
 				<label for="profInput">
 					<span class="description">Dozent:</span> 
 					<br />
-					<input type="text" list="profList" id="profInput" onchange="fsdeluxe.exams.getLectures()" placeholder="Dozent" value=""/>
+					<input type="text" list="profList" id="profInput" placeholder="Dozent" value=""/>
 				</label>
 
 				<label for="searchInput">
 					<span class="description">Suche:</span>
 					<br />
 					<span id="searchInputs">
-						<input type="text" list="lecturesList" id="searchInput0" onchange="fsdeluxe.exams.getProfs()" placeholder="Vorlesung"/>
+						<input type="text" list="lecturesList" id="searchInput0" placeholder="Vorlesung"/>
 					</span>
 					<span class="button" onclick="fsdeluxe.gui.addSearchField()">+</span>
 				</label>
@@ -56,7 +56,7 @@
 					<label for="select-mode">
 						<span class="description">Typ</span>
 						<br/>
-						<select id="select-mode" onchange="fsdeluxe.exams.typeChanged()">
+						<select id="select-mode" onchange="schwarzwald.legacy.modeChanged(event);">
 							<option value="p">Protokolle</option>
 							<option value="k">Klausuren</option>
 						</select>
@@ -76,7 +76,7 @@
 				</div>
 
 				<div class="clear"></div>
-				<span class="button" onclick="fsdeluxe.exams.search();">Suchen</span>
+				<span class="button" onclick="schwarzwald.search();">Suchen</span>
 				<div id="limit">
 					<label for="limitInput">
 						<span class="description">Maximale Anzahl:</span>
@@ -191,10 +191,12 @@
 		<script src="static/debug.js"></script>
 
 		<!-- Actual code //-->
+		<script src="static/schwarzwald.js"></script>
 		<script src="static/config.js"></script>
 		<script src="static/api.js"></script>
 		<script src="static/gui.js"></script>
 		<script src="static/log.js"></script>
+		<script src="static/legacy.js"></script>
 
 		<script src="static/common.js"></script>
 		<script src="static/lectures.js"></script>

@@ -54,7 +54,6 @@ fsdeluxe.gui = fsdeluxe.gui || {
         span.appendChild(selector);
         var elem = gui.cr('input');
         elem.setAttribute('list', 'lecturesList');
-        elem.onchange = fsdeluxe.exams.getProfs();
         elem.setAttribute('placeholder', 'Vorlesung');
         span.appendChild(elem);
         var rm = gui.cr('span');
